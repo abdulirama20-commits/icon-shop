@@ -633,9 +633,6 @@
 
     <!-- GLOBAL APPLICATION LOGIC -->
     <script>
-        // EMBEDDED LOGO (DATA URI)
-        const APP_LOGO_BASE64 = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAH0AfQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1ldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnA0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnA0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIR00AAAAB9KooqrqGo22mWj3N3KI4x+JPYDuasf/QooqrqGo22mWj3N3KI4x+JPYDuasf";
-
         const MIN_STOCK_ALERT = 3;
 
         let currentUser = null;
@@ -662,10 +659,14 @@
         let html5QrcodeScanner = null;
         let modalQrcodeScanner = null;
 
+        // NJIA YENYE UHAKIKA YA KULOAD PICHA YA LOGO
         function loadLogos() {
-            document.getElementById('app-logo-login').src = APP_LOGO_BASE64;
-            document.getElementById('app-logo-mobile').src = APP_LOGO_BASE64;
-            document.getElementById('app-logo-sidebar').src = APP_LOGO_BASE64;
+            // Weka picha yako ya logo kwenye folda moja na hii HTML kisha uipe jina la 'logo.png'
+            const logoPath = "logo.png"; 
+
+            document.getElementById('app-logo-login').src = logoPath;
+            document.getElementById('app-logo-mobile').src = logoPath;
+            document.getElementById('app-logo-sidebar').src = logoPath;
         }
 
         function updateClock() {
