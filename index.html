@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NMA 100%</title>
+  
+  <!-- HTML5 QR CODE SCANNER LIBRARY -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
   <style>
     :root {
       --bg-main: #f7f3ec;
@@ -47,8 +51,9 @@
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
     /* BUTTONS */
-    .btn-brown { background: var(--accent-brown); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; width: 100%; }
+    .btn-brown { background: var(--accent-brown); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 5px; }
     .btn-brown:hover { background: var(--accent-brown-hover); }
+    .btn-secondary { background: #6b7280; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     .btn-edit { background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-right: 5px; }
     .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
@@ -65,6 +70,11 @@
     /* SECTIONS TOGGLE */
     .page-section { display: none; }
     .page-section.active-page { display: block; }
+
+    /* MODAL STYLES */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: #fff; padding: 25px; border-radius: 16px; width: 100%; max-width: 500px; }
   </style>
 </head>
 <body>
@@ -76,6 +86,7 @@
     <a class="nav-item" onclick="showPage('productsPage', this)">📦 Products</a>
     <a class="nav-item" onclick="showPage('purchasingPage', this)">🛍️ Purchasing (Stock In)</a>
     <a class="nav-item" onclick="showPage('salesPage', this)">🛒 Sales (POS)</a>
+    <a class="nav-item" onclick="showPage('customersPage', this)">👥 Customers Management</a>
     <a class="nav-item" onclick="showPage('inventoryPage', this)">🏭 Inventory List</a>
     <a class="nav-item" onclick="showPage('reportsPage', this)">📈 Sales History</a>
   </div>
@@ -145,7 +156,7 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Part Number / SKU:</label>
+              <label>Part Number / SKU / Barcode:</label>
               <input type="text" id="pPartNo" placeholder="PCL-100" required>
             </div>
             <div class="form-group">
@@ -201,7 +212,7 @@
       </div>
     </div>
 
-    <!-- 4. SALES PAGE (POS) -->
+    <!-- 4. SALES PAGE (POS WITH BARCODE SCANNING) -->
     <div id="salesPage" class="page-section">
       <div class="top-bar">
         <div>
@@ -210,8 +221,25 @@
         </div>
       </div>
       <div class="card" style="max-width: 500px;">
+
+        <!-- BARCODE INPUT (HARDWARE SCANNER) -->
         <div class="form-group">
-          <label>Chagua Bidhaa Inayouzwa:</label>
+          <label>📷 Scan Barcode (Hardware Scanner):</label>
+          <input type="text" id="barcodeInput" placeholder="Elekeza scanner hapa..." autofocus>
+        </div>
+
+        <!-- CAMERA SCANNING BUTTON & CONTAINER -->
+        <button type="button" class="btn-secondary" style="width: 100%; margin-bottom: 15px;" onclick="startCameraScanner()">
+          📷 Scan Kwa Kamera ya Simu
+        </button>
+
+        <div id="reader-container" style="display:none; margin-bottom: 15px; border: 1px solid var(--border-color); padding: 10px; border-radius: 12px; text-align: center;">
+          <div id="reader"></div>
+          <button type="button" class="btn-delete" style="margin-top: 8px;" onclick="stopCameraScanner()">Funga Kamera</button>
+        </div>
+
+        <div class="form-group">
+          <label>Chagua Bidhaa Inayouzwa Manually:</label>
           <select id="saleProductSelect">
             <option value="">Chagua Bidhaa...</option>
           </select>
@@ -222,15 +250,44 @@
             <input type="number" id="saleQty" value="1" min="1">
           </div>
           <div class="form-group">
-            <label>Jina la Mteja (Sio Lazima):</label>
-            <input type="text" id="saleCustomer" placeholder="Jina la mteja">
+            <label>Chagua Mteja:</label>
+            <select id="saleCustomerSelect">
+              <option value="Cash Customer">Mteja wa Kawaida (Cash)</option>
+            </select>
           </div>
         </div>
         <button type="button" class="btn-brown" onclick="processSale()">Sajili Mauzo</button>
       </div>
     </div>
 
-    <!-- 5. INVENTORY LIST PAGE -->
+    <!-- 5. CUSTOMERS MANAGEMENT PAGE -->
+    <div id="customersPage" class="page-section">
+      <div class="top-bar">
+        <div>
+          <p class="subtitle">Customer Care</p>
+          <h1>Usimamizi wa Wateja</h1>
+        </div>
+        <button class="btn-brown" style="width: auto;" onclick="openCustomerModal()">+ Ongeza Mteja Mpya</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Jina la Mteja</th>
+              <th>Simu</th>
+              <th>Anwani / Mahali</th>
+              <th>Deni (TSh)</th>
+              <th>Vitendo</th>
+            </tr>
+          </thead>
+          <tbody id="customersTableBody">
+            <tr><td colspan="5" style="text-align:center;">Inapakia wateja...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 6. INVENTORY LIST PAGE -->
     <div id="inventoryPage" class="page-section">
       <div class="top-bar">
         <div>
@@ -257,7 +314,7 @@
       </div>
     </div>
 
-    <!-- 6. SALES HISTORY PAGE -->
+    <!-- 7. SALES HISTORY PAGE -->
     <div id="reportsPage" class="page-section">
       <div class="top-bar">
         <div>
@@ -285,12 +342,39 @@
 
   </div>
 
+  <!-- MODAL YA USIMAMIZI WA WATEJA -->
+  <div id="customerModal" class="modal">
+    <div class="modal-content">
+      <h3 id="custModalTitle" style="margin-bottom: 15px;">Ongeza Mteja Mpya</h3>
+      <input type="hidden" id="editCustId" value="">
+      <div class="form-group">
+        <label>Jina Kamili:</label>
+        <input type="text" id="cName" placeholder="Mfano: Juma Shabani" required>
+      </div>
+      <div class="form-group">
+        <label>Namba ya Simu:</label>
+        <input type="text" id="cPhone" placeholder="0712345678" required>
+      </div>
+      <div class="form-group">
+        <label>Anwani / Mahali:</label>
+        <input type="text" id="cAddress" placeholder="Kariakoo, Dar es Salaam">
+      </div>
+      <div class="form-group">
+        <label>Deni la Awali (TSh):</label>
+        <input type="number" id="cDebt" value="0">
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button type="button" class="btn-brown" onclick="saveCustomer()">Hifadhi Mteja</button>
+        <button type="button" class="btn-secondary" onclick="closeCustomerModal()">Ghairi</button>
+      </div>
+    </div>
+  </div>
+
   <!-- FIREBASE SDK & APP SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Mipangilio ya Firebase yako
     const firebaseConfig = {
       apiKey: "AIzaSyDummyKeyForYourProject",
       authDomain: "nma-100.firebaseapp.com",
@@ -304,8 +388,10 @@
     const db = getFirestore(app);
 
     let productsData = [];
+    let customersData = [];
+    let html5QrcodeScanner = null;
 
-    // Fanya functions ziwe za kimataifa (global scope)
+    // Toggle Pages
     window.showPage = function(pageId, element) {
       document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active-page'));
       document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -313,18 +399,25 @@
       if(element) element.classList.add('active');
     };
 
-    // Kusikiliza Mabadiliko kwenye Database (Real-time Listener)
+    // Real-time listener for Products
     onSnapshot(collection(db, "products"), (snapshot) => {
       productsData = [];
-      let lowStockCount = 0;
-
       snapshot.forEach((doc) => {
         productsData.push({ id: doc.id, ...doc.data() });
       });
-
       renderDashboard();
       renderInventory();
       populateDropdowns();
+    });
+
+    // Real-time listener for Customers
+    onSnapshot(collection(db, "customers"), (snapshot) => {
+      customersData = [];
+      snapshot.forEach((doc) => {
+        customersData.push({ id: doc.id, ...doc.data() });
+      });
+      renderCustomers();
+      populateCustomerDropdown();
     });
 
     // Render Dashboard
@@ -351,7 +444,7 @@
       document.getElementById('globalAlert').style.display = lowStock > 0 ? 'block' : 'none';
     }
 
-    // Render Inventory Table
+    // Render Inventory
     function renderInventory() {
       const invTable = document.getElementById('inventoryTableBody');
       invTable.innerHTML = '';
@@ -374,7 +467,35 @@
       });
     }
 
-    // Popola Select Options
+    // Render Customers Table
+    function renderCustomers() {
+      const custTable = document.getElementById('customersTableBody');
+      custTable.innerHTML = '';
+
+      if (customersData.length === 0) {
+        custTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">Hakuna mteja aliyesajiliwa bado.</td></tr>';
+        return;
+      }
+
+      customersData.forEach(c => {
+        custTable.innerHTML += `
+          <tr>
+            <td><strong>${c.name}</strong></td>
+            <td>${c.phone}</td>
+            <td>${c.address || '-'}</td>
+            <td style="color: ${c.debt > 0 ? 'var(--danger-red)' : 'var(--success-green)'}; font-weight: bold;">
+              TSh ${Number(c.debt || 0).toLocaleString()}
+            </td>
+            <td>
+              <button class="btn-edit" onclick="prepareEditCustomer('${c.id}')">Edit</button>
+              <button class="btn-delete" onclick="deleteCustomer('${c.id}')">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // Dropdowns
     function populateDropdowns() {
       const buySelect = document.getElementById('buyProductSelect');
       const saleSelect = document.getElementById('saleProductSelect');
@@ -388,7 +509,16 @@
       saleSelect.innerHTML = options;
     }
 
-    // Hifadhi ama Update Bidhaa
+    function populateCustomerDropdown() {
+      const saleCustSelect = document.getElementById('saleCustomerSelect');
+      let options = '<option value="Cash Customer">Mteja wa Kawaida (Cash)</option>';
+      customersData.forEach(c => {
+        options += `<option value="${c.name}">${c.name} (${c.phone})</option>`;
+      });
+      saleCustSelect.innerHTML = options;
+    }
+
+    // Save or Edit Product
     window.saveProduct = async function() {
       const docId = document.getElementById('editDocId').value;
       const name = document.getElementById('pName').value;
@@ -406,7 +536,6 @@
 
       try {
         if (docId) {
-          // UPDATE
           await updateDoc(doc(db, "products", docId), {
             name, partNo, carModel,
             buyPrice: Number(buyPrice),
@@ -416,7 +545,6 @@
           });
           alert("Bidhaa imerekebishwa kikamilifu!");
         } else {
-          // ADD NEW
           await addDoc(collection(db, "products"), {
             name, partNo, carModel,
             buyPrice: Number(buyPrice),
@@ -427,7 +555,6 @@
           alert("Bidhaa mpya imehifadhiwa!");
         }
 
-        // Reset Form
         document.getElementById('productForm').reset();
         document.getElementById('editDocId').value = '';
         document.getElementById('formTitle').innerText = 'Sajili Bidhaa Mpya';
@@ -438,7 +565,6 @@
       }
     };
 
-    // Tayarisha Fomu kwa ajili ya Edit
     window.prepareEdit = function(id) {
       const item = productsData.find(p => p.id === id);
       if (!item) return;
@@ -459,7 +585,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Kufuta Bidhaa (Delete)
     window.deleteProduct = async function(id) {
       if (confirm("Je, una uhakika unataka kufuta bidhaa hii kikamilifu?")) {
         try {
@@ -471,7 +596,123 @@
       }
     };
 
-    // Kuongeza Stock (Purchasing)
+    // CUSTOMER FUNCTIONS
+    window.openCustomerModal = function() {
+      document.getElementById('editCustId').value = '';
+      document.getElementById('cName').value = '';
+      document.getElementById('cPhone').value = '';
+      document.getElementById('cAddress').value = '';
+      document.getElementById('cDebt').value = 0;
+      document.getElementById('custModalTitle').innerText = 'Ongeza Mteja Mpya';
+      document.getElementById('customerModal').classList.add('show');
+    };
+
+    window.closeCustomerModal = function() {
+      document.getElementById('customerModal').classList.remove('show');
+    };
+
+    window.saveCustomer = async function() {
+      const id = document.getElementById('editCustId').value;
+      const name = document.getElementById('cName').value.trim();
+      const phone = document.getElementById('cPhone').value.trim();
+      const address = document.getElementById('cAddress').value.trim();
+      const debt = Number(document.getElementById('cDebt').value) || 0;
+
+      if (!name || !phone) {
+        alert("Tafadhali jaza Jina na Namba ya Simu ya mteja!");
+        return;
+      }
+
+      try {
+        if (id) {
+          await updateDoc(doc(db, "customers", id), { name, phone, address, debt });
+          alert("Taarifa za mteja zimebadilishwa!");
+        } else {
+          await addDoc(collection(db, "customers"), { name, phone, address, debt });
+          alert("Mteja mpya amesajiliwa kikamilifu!");
+        }
+        closeCustomerModal();
+      } catch (e) {
+        alert("Imeshindikana kuhifadhi mteja: " + e.message);
+      }
+    };
+
+    window.prepareEditCustomer = function(id) {
+      const c = customersData.find(item => item.id === id);
+      if (!c) return;
+
+      document.getElementById('editCustId').value = c.id;
+      document.getElementById('cName').value = c.name;
+      document.getElementById('cPhone').value = c.phone;
+      document.getElementById('cAddress').value = c.address || '';
+      document.getElementById('cDebt').value = c.debt || 0;
+      document.getElementById('custModalTitle').innerText = 'Badili Taarifa za Mteja';
+
+      document.getElementById('customerModal').classList.add('show');
+    };
+
+    window.deleteCustomer = async function(id) {
+      if (confirm("Je, una uhakika unataka kumfuta mteja huyu?")) {
+        try {
+          await deleteDoc(doc(db, "customers", id));
+          alert("Mteja amefutwa!");
+        } catch (e) {
+          alert("Imeshindikana kufuta: " + e.message);
+        }
+      }
+    };
+
+    // BARCODE SCANNING LOGIC
+    document.getElementById('barcodeInput').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        let barcodeValue = this.value.trim();
+        if (barcodeValue) {
+          matchAndSelectBarcodeProduct(barcodeValue);
+          this.value = '';
+        }
+      }
+    });
+
+    window.startCameraScanner = function() {
+      document.getElementById('reader-container').style.display = 'block';
+      html5QrcodeScanner = new Html5Qrcode("reader");
+      const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+
+      html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        config,
+        (decodedText) => {
+          matchAndSelectBarcodeProduct(decodedText);
+          stopCameraScanner();
+        },
+        () => {}
+      ).catch(err => {
+        alert("Kamera Imeshindwa Funguka: " + err);
+      });
+    };
+
+    window.stopCameraScanner = function() {
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+          document.getElementById('reader-container').style.display = 'none';
+        }).catch(err => console.error(err));
+      } else {
+        document.getElementById('reader-container').style.display = 'none';
+      }
+    };
+
+    function matchAndSelectBarcodeProduct(barcode) {
+      const matched = productsData.find(p => p.partNo.toLowerCase() === barcode.toLowerCase());
+      if (matched) {
+        document.getElementById('saleProductSelect').value = matched.id;
+        alert(`Bidhaa Imepatikana: ${matched.name}`);
+      } else {
+        alert(`Hakuna bidhaa yenye Barcode/SKU: ${barcode}`);
+      }
+    }
+
+    // Stock & Sales operations
     window.processStockIn = async function() {
       const pId = document.getElementById('buyProductSelect').value;
       const qty = Number(document.getElementById('buyQty').value);
@@ -480,14 +721,11 @@
 
       const item = productsData.find(p => p.id === pId);
       if(item) {
-        await updateDoc(doc(db, "products", pId), {
-          stock: Number(item.stock) + qty
-        });
+        await updateDoc(doc(db, "products", pId), { stock: Number(item.stock) + qty });
         alert("Stock imeongezwa kikamilifu!");
       }
     };
 
-    // Kutenda Mauzo (Sales)
     window.processSale = async function() {
       const pId = document.getElementById('saleProductSelect').value;
       const qty = Number(document.getElementById('saleQty').value);
@@ -501,10 +739,7 @@
           return;
         }
 
-        await updateDoc(doc(db, "products", pId), {
-          stock: Number(item.stock) - qty
-        });
-
+        await updateDoc(doc(db, "products", pId), { stock: Number(item.stock) - qty });
         alert("Mauzo yamekamilika!");
       }
     };
