@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NMA 100% - Inventory Management System with Branches</title>
+    <title>NMA 100% - Multi-Branch Inventory System</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -73,17 +73,18 @@
                     <div>
                         <p class="text-xs text-gray-500 uppercase font-semibold">Mtumiaji Aliyeingia</p>
                         <p id="current-user-display" class="text-sm font-bold text-gray-800">Admin</p>
+                        <p id="current-user-branch" class="text-[10px] text-blue-600 font-semibold"></p>
                     </div>
-                    <span id="role-badge" class="px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">ADMIN</span>
+                    <span id="role-badge" class="px-2 py-0.5 text-[10px] font-semibold bg-blue-100 text-blue-800 rounded-full">ADMIN</span>
                 </div>
 
                 <nav class="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-250px)]">
-                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-chart-pie w-6 text-gray-500"></i>
                         <span>Dashboard</span>
                     </button>
 
-                    <button onclick="switchTab('branches')" id="nav-branches" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('branches')" id="nav-branches" class="super-admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-code-branch w-6 text-gray-500"></i>
                         <span>Matawi (Branches)</span>
                     </button>
@@ -118,7 +119,7 @@
                         <span>Ripoti za Mauzo</span>
                     </button>
 
-                    <button onclick="switchTab('users')" id="nav-users" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('users')" id="nav-users" class="super-admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-user-gear w-6 text-gray-500"></i>
                         <span>Watumiaji & Passwords</span>
                     </button>
@@ -137,8 +138,19 @@
 
             <!-- DASHBOARD SECTION -->
             <section id="section-dashboard" class="tab-content space-y-6">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold text-gray-800">Muhtasari wa Biashara</h2>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Muhtasari wa Biashara</h2>
+                        <p id="dashboard-scope-text" class="text-xs text-blue-600 font-semibold mt-1"></p>
+                    </div>
+
+                    <!-- Branch Selector Filter (Visible to Super Admin only) -->
+                    <div id="super-admin-branch-filter" class="hidden flex items-center gap-2 bg-white p-2 border rounded-xl shadow-sm">
+                        <label class="text-xs font-bold text-gray-600"><i class="fa-solid fa-filter mr-1"></i>Chuja Tawi:</label>
+                        <select id="dash-branch-filter" onchange="renderDashboard()" class="text-sm font-semibold bg-gray-50 p-1.5 border rounded-lg focus:outline-none">
+                            <option value="ALL">Matawi Yote (All Branches)</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -174,7 +186,7 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800">Usimamizi wa Matawi (Branches)</h2>
-                        <p class="text-xs text-gray-500">Ongeza au simamia matawi yako ya biashara hapa.</p>
+                        <p class="text-xs text-gray-500">Super Admin pekee ndiye anayeweza kuongeza na kusimamia matawi.</p>
                     </div>
                     <button onclick="openBranchModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700">
                         <i class="fa-solid fa-plus mr-1"></i> Ongeza Tawi Jipya
@@ -187,6 +199,7 @@
                             <tr>
                                 <th class="p-4">Jina la Tawi</th>
                                 <th class="p-4">Eneo / Anwani</th>
+                                <th class="p-4 text-center">Njia ya Mkato</th>
                                 <th class="p-4 text-center">Kitendo</th>
                             </tr>
                         </thead>
@@ -292,9 +305,7 @@
             <!-- STOCK LOGS SECTION -->
             <section id="section-stock-logs" class="tab-content hidden space-y-6">
                 <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800">Kumbukumbu za Mzigo Ulioingizwa</h2>
-                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Kumbukumbu za Mzigo Ulioingizwa</h2>
                 </div>
 
                 <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
@@ -366,9 +377,7 @@
             <!-- REPORTS SECTION -->
             <section id="section-reports" class="tab-content hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800">Ripoti za Mauzo</h2>
-                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Ripoti za Mauzo</h2>
                     <div class="inline-flex rounded-lg bg-gray-200 p-1">
                         <button onclick="setReportFilter('day')" id="btn-report-day" class="px-4 py-1.5 text-xs font-bold rounded-md bg-white text-blue-600 shadow transition">Siku (Leo)</button>
                         <button onclick="setReportFilter('week')" id="btn-report-week" class="px-4 py-1.5 text-xs font-bold rounded-md text-gray-600 hover:text-gray-900 transition">Wiki Hii</button>
@@ -402,6 +411,7 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800">Usimamizi wa Watumiaji</h2>
+                        <p class="text-xs text-gray-500">Super Admin anaweza kuteua Branch Admin na Cashier kwa kila tawi.</p>
                     </div>
                     <button onclick="openUserModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700">
                         <i class="fa-solid fa-user-plus mr-1"></i> Ongeza Mtumiaji
@@ -414,6 +424,7 @@
                             <tr>
                                 <th class="p-4">Jina la Mtumiaji</th>
                                 <th class="p-4">Nafasi (Role)</th>
+                                <th class="p-4">Tawi Alilopangiwa</th>
                                 <th class="p-4">Password</th>
                                 <th class="p-4 text-center">Badili Password</th>
                                 <th class="p-4 text-center">Kitendo</th>
@@ -431,6 +442,7 @@
     <div id="printable-receipt" class="p-6 max-w-sm mx-auto font-mono text-sm">
         <div class="text-center border-b pb-3 mb-3">
             <h2 class="text-xl font-bold uppercase">NMA 100%</h2>
+            <p class="text-xs font-semibold" id="receipt-branch-name"></p>
             <p class="text-xs">Simu: +255 123 456 789</p>
             <p class="text-xs" id="receipt-date"></p>
             <p class="text-xs font-bold mt-1" id="receipt-customer"></p>
@@ -471,7 +483,7 @@
         <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
             <h3 class="text-lg font-bold text-gray-800">Ongeza Bidhaa Mpya</h3>
             <div>
-                <label class="block text-xs font-semibold text-gray-500 mb-1">Tawi</label>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Tawi la Bidhaa Hii</label>
                 <select id="prod-branch-select" class="w-full p-2 border rounded-lg"></select>
             </div>
             <div>
@@ -545,14 +557,23 @@
         </div>
     </div>
 
+    <!-- USER MODAL (SUPPORTING BRANCH APPOINTMENT) -->
     <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
             <h3 class="text-lg font-bold text-gray-800">Ongeza Mtumiaji Mpya</h3>
             <input type="text" id="new-user-name" placeholder="Jina la Mtumiaji" class="w-full p-2 border rounded-lg">
-            <select id="new-user-role" class="w-full p-2 border rounded-lg">
-                <option value="cashier">Mhudumu (Cashier)</option>
-                <option value="admin">Msimamizi (Admin)</option>
-            </select>
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Nafasi (Role)</label>
+                <select id="new-user-role" class="w-full p-2 border rounded-lg">
+                    <option value="cashier">Mhudumu (Cashier)</option>
+                    <option value="admin">Admin wa Tawi (Branch Admin)</option>
+                    <option value="superadmin">Super Admin (Mkuu)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Tawi Analosimamia/Anapofanyia Kazi</label>
+                <select id="new-user-branch" class="w-full p-2 border rounded-lg"></select>
+            </div>
             <input type="password" id="new-user-pass" placeholder="Password" class="w-full p-2 border rounded-lg">
             <div class="flex justify-end gap-2">
                 <button onclick="closeUserModal()" class="px-4 py-2 border rounded-lg">Ghairi</button>
@@ -566,13 +587,18 @@
         const MIN_STOCK_ALERT = 3;
 
         let currentUser = null;
+        
+        // Default users configuration
         let users = JSON.parse(localStorage.getItem('nma_users')) || [
-            { name: 'Admin', role: 'admin', pass: 'admin123' },
-            { name: 'Cashier', role: 'cashier', pass: '1234' }
+            { name: 'Boss Admin', role: 'superadmin', branch: 'ALL', pass: 'admin123' },
+            { name: 'Admin Kariakoo', role: 'admin', branch: 'Tawi la Kariakoo', pass: '1234' },
+            { name: 'Mhudumu Mwenge', role: 'cashier', branch: 'Tawi la Mwenge', pass: '1234' }
         ];
 
         let branches = JSON.parse(localStorage.getItem('nma_branches')) || [
-            { name: 'Tawi Kuu (Main)', location: 'Makao Makuu' }
+            { name: 'Tawi Kuu (Main)', location: 'Makao Makuu' },
+            { name: 'Tawi la Kariakoo', location: 'Kariakoo' },
+            { name: 'Tawi la Mwenge', location: 'Mwenge' }
         ];
 
         let products = JSON.parse(localStorage.getItem('nma_products')) || [];
@@ -597,7 +623,7 @@
 
         function populateLoginUsers() {
             const select = document.getElementById('login-user-select');
-            select.innerHTML = users.map(u => `<option value="${u.name}">${u.name} (${u.role.toUpperCase()})</option>`).join('');
+            select.innerHTML = users.map(u => `<option value="${u.name}">${u.name} (${u.role.toUpperCase()} - ${u.branch})</option>`).join('');
         }
 
         function handleLogin(e) {
@@ -611,15 +637,22 @@
                 currentUser = foundUser;
                 document.getElementById('login-overlay').classList.add('hidden');
                 document.getElementById('current-user-display').innerText = foundUser.name;
+                document.getElementById('current-user-branch').innerText = foundUser.branch === 'ALL' ? 'Matawi Yote' : foundUser.branch;
                 document.getElementById('role-badge').innerText = foundUser.role.toUpperCase();
 
+                // Permissions logic
                 if (foundUser.role === 'cashier') {
-                    document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
+                    document.querySelectorAll('.admin-only, .super-admin-only').forEach(el => el.classList.add('hidden'));
                     switchTab('pos');
-                } else {
+                } else if (foundUser.role === 'admin') {
                     document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+                    document.querySelectorAll('.super-admin-only').forEach(el => el.classList.add('hidden'));
+                    switchTab('dashboard');
+                } else if (foundUser.role === 'superadmin') {
+                    document.querySelectorAll('.admin-only, .super-admin-only').forEach(el => el.classList.remove('hidden'));
                     switchTab('dashboard');
                 }
+                
                 renderAll();
             } else {
                 alert('Neno la siri (password) sio sahihi!');
@@ -653,7 +686,7 @@
             updateBranchDropdowns();
         }
 
-        // --- BRANCH MANAGEMENT FUNCTIONS ---
+        // --- BRANCH MANAGEMENT & QUICK ACTIONS ---
         function openBranchModal() { document.getElementById('branch-modal').classList.remove('hidden'); }
         function closeBranchModal() { document.getElementById('branch-modal').classList.add('hidden'); }
         
@@ -687,17 +720,57 @@
                     <td class="p-4 font-bold text-gray-800">${b.name}</td>
                     <td class="p-4 text-gray-600">${b.location || 'N/A'}</td>
                     <td class="p-4 text-center">
+                        <button onclick="quickAddProductForBranch('${b.name}')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded-lg text-xs font-bold transition">
+                            <i class="fa-solid fa-plus mr-1"></i> Ongeza Bidhaa
+                        </button>
+                    </td>
+                    <td class="p-4 text-center">
                         <button onclick="deleteBranch(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
         }
 
+        function quickAddProductForBranch(branchName) {
+            switchTab('products');
+            openProductModal();
+            document.getElementById('prod-branch-select').value = branchName;
+        }
+
         function updateBranchDropdowns() {
-            const select = document.getElementById('prod-branch-select');
-            if (select) {
-                select.innerHTML = branches.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+            const prodSelect = document.getElementById('prod-branch-select');
+            const userBranchSelect = document.getElementById('new-user-branch');
+            const filterSelect = document.getElementById('dash-branch-filter');
+
+            const options = branches.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+
+            if (prodSelect) prodSelect.innerHTML = options;
+            if (userBranchSelect) {
+                userBranchSelect.innerHTML = `<option value="ALL">Matawi Yote (Super Admin Only)</option>` + options;
             }
+
+            if (filterSelect) {
+                filterSelect.innerHTML = `<option value="ALL">Matawi Yote (All Branches)</option>` + options;
+            }
+        }
+
+        // --- SCOPED DATA HELPER (Branch Filtering) ---
+        function getScopedProducts() {
+            if (!currentUser) return [];
+            if (currentUser.role === 'superadmin') {
+                const filter = document.getElementById('dash-branch-filter')?.value || 'ALL';
+                return filter === 'ALL' ? products : products.filter(p => p.branch === filter);
+            }
+            return products.filter(p => p.branch === currentUser.branch);
+        }
+
+        function getScopedSales() {
+            if (!currentUser) return [];
+            if (currentUser.role === 'superadmin') {
+                const filter = document.getElementById('dash-branch-filter')?.value || 'ALL';
+                return filter === 'ALL' ? salesHistory : salesHistory.filter(s => s.branch === filter);
+            }
+            return salesHistory.filter(s => s.branch === currentUser.branch);
         }
 
         function renderUsers() {
@@ -705,7 +778,8 @@
             tbody.innerHTML = users.map((u, index) => `
                 <tr class="hover:bg-gray-50">
                     <td class="p-4 font-bold text-gray-800">${u.name}</td>
-                    <td class="p-4"><span class="px-2 py-1 ${u.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'} text-xs font-bold rounded">${u.role.toUpperCase()}</span></td>
+                    <td class="p-4"><span class="px-2 py-1 ${u.role === 'superadmin' ? 'bg-purple-100 text-purple-800' : u.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'} text-xs font-bold rounded">${u.role.toUpperCase()}</span></td>
+                    <td class="p-4 font-semibold text-gray-600">${u.branch}</td>
                     <td class="p-4 font-mono text-gray-600">${u.pass}</td>
                     <td class="p-4 text-center">
                         <button onclick="changeUserPassword(${index})" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs font-semibold">
@@ -732,13 +806,16 @@
 
         function renderProducts() {
             const tbody = document.getElementById('products-table-body');
-            tbody.innerHTML = products.map((p, index) => {
+            const displayProducts = getScopedProducts();
+
+            tbody.innerHTML = displayProducts.map((p, index) => {
                 const isLowStock = p.stock <= MIN_STOCK_ALERT;
+                const realIndex = products.findIndex(item => item.barcode === p.barcode);
                 return `
                     <tr class="hover:bg-gray-50 ${isLowStock ? 'bg-red-50' : ''}">
                         <td class="p-4 font-mono font-semibold text-blue-600">${p.barcode || 'N/A'}</td>
                         <td class="p-4 font-bold">${p.name}</td>
-                        <td class="p-4"><span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">${p.branch || 'Tawi Kuu'}</span></td>
+                        <td class="p-4"><span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">${p.branch}</span></td>
                         <td class="p-4">TSH ${p.cost}</td>
                         <td class="p-4 font-bold text-emerald-600">TSH ${p.price}</td>
                         <td class="p-4">
@@ -747,10 +824,10 @@
                             </span>
                         </td>
                         <td class="p-4 text-center flex justify-center gap-2">
-                            <button onclick="openRestockModal(${index})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold">
+                            <button onclick="openRestockModal(${realIndex})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold">
                                 <i class="fa-solid fa-plus"></i> Restock
                             </button>
-                            ${currentUser?.role === 'admin' ? `<button onclick="deleteProduct(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>` : ''}
+                            <button onclick="deleteProduct(${realIndex})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
@@ -759,15 +836,20 @@
 
         function renderStockLogs() {
             const tbody = document.getElementById('stock-logs-table-body');
-            if (stockLogs.length === 0) {
+            let logs = stockLogs;
+            if (currentUser && currentUser.role !== 'superadmin') {
+                logs = stockLogs.filter(l => l.branch === currentUser.branch);
+            }
+
+            if (logs.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">Hakuna kumbukumbu za mzigo.</td></tr>`;
                 return;
             }
-            tbody.innerHTML = [...stockLogs].reverse().map(log => `
+            tbody.innerHTML = [...logs].reverse().map(log => `
                 <tr class="hover:bg-gray-50 border-b">
                     <td class="p-4 font-mono text-xs text-gray-500">${log.date}</td>
                     <td class="p-4 font-bold text-gray-800">${log.productName}</td>
-                    <td class="p-4"><span class="px-2 py-0.5 bg-blue-50 text-blue-800 text-xs rounded">${log.branch || 'Tawi Kuu'}</span></td>
+                    <td class="p-4"><span class="px-2 py-0.5 bg-blue-50 text-blue-800 text-xs rounded">${log.branch}</span></td>
                     <td class="p-4"><span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold">+${log.qtyAdded}</span></td>
                     <td class="p-4 text-gray-600">${log.supplier}</td>
                     <td class="p-4 text-xs">${log.addedBy}</td>
@@ -806,10 +888,12 @@
 
         function renderPosGrid() {
             const grid = document.getElementById('pos-products-grid');
-            grid.innerHTML = products.map(p => `
+            const displayProducts = getScopedProducts();
+
+            grid.innerHTML = displayProducts.map(p => `
                 <div onclick="addToCart('${p.barcode}')" class="p-3 border rounded-xl hover:shadow-md cursor-pointer transition bg-gray-50 flex flex-col justify-between">
                     <div>
-                        <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold">${p.branch || 'Tawi Kuu'}</span>
+                        <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold">${p.branch}</span>
                         <h4 class="font-bold text-sm text-gray-800 mt-1">${p.name}</h4>
                     </div>
                     <div class="mt-2 flex justify-between items-center">
@@ -822,12 +906,14 @@
 
         function filterPosProducts() {
             const query = document.getElementById('pos-search').value.toLowerCase();
-            const filtered = products.filter(p => p.name.toLowerCase().includes(query) || (p.barcode && p.barcode.toLowerCase().includes(query)));
+            const displayProducts = getScopedProducts();
+            const filtered = displayProducts.filter(p => p.name.toLowerCase().includes(query) || (p.barcode && p.barcode.toLowerCase().includes(query)));
+            
             const grid = document.getElementById('pos-products-grid');
             grid.innerHTML = filtered.map(p => `
                 <div onclick="addToCart('${p.barcode}')" class="p-3 border rounded-xl hover:shadow-md cursor-pointer transition bg-gray-50 flex flex-col justify-between">
                     <div>
-                        <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold">${p.branch || 'Tawi Kuu'}</span>
+                        <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold">${p.branch}</span>
                         <h4 class="font-bold text-sm text-gray-800 mt-1">${p.name}</h4>
                     </div>
                     <div class="mt-2 flex justify-between items-center">
@@ -852,7 +938,8 @@
         }
 
         function addToCart(barcode) {
-            const product = products.find(p => p.barcode === barcode);
+            const displayProducts = getScopedProducts();
+            const product = displayProducts.find(p => p.barcode === barcode);
             if (!product || product.stock <= 0) return alert('Bidhaa haipo au imeisha stoo!');
 
             const existing = cart.find(item => item.barcode === barcode);
@@ -919,12 +1006,15 @@
                 }
             }
 
+            const activeBranch = currentUser.role === 'superadmin' ? (cart[0]?.branch || 'Tawi Kuu') : currentUser.branch;
+
             const saleRecord = {
                 id: Date.now(),
                 timestamp: Date.now(),
                 date: new Date().toLocaleString('sw-TZ'),
                 customer: customerName,
                 paymentType: paymentType,
+                branch: activeBranch,
                 items: [...cart],
                 total: total
             };
@@ -940,6 +1030,7 @@
         }
 
         function triggerReceiptPrint(sale) {
+            document.getElementById('receipt-branch-name').innerText = `TAWI: ${sale.branch}`;
             document.getElementById('receipt-date').innerText = sale.date;
             document.getElementById('receipt-customer').innerText = `Mteja: ${sale.customer}`;
             document.getElementById('receipt-type').innerText = `Aina: ${sale.paymentType === 'Credit' ? 'MKOPO' : 'CASH'}`;
@@ -990,16 +1081,28 @@
         }
 
         function renderDashboard() {
-            document.getElementById('dash-total-products').innerText = products.length;
+            if (currentUser?.role === 'superadmin') {
+                document.getElementById('super-admin-branch-filter').classList.remove('hidden');
+                document.getElementById('dashboard-scope-text').innerText = 'Unatazama data za matawi kulingana na filter hapa kulia.';
+            } else {
+                document.getElementById('super-admin-branch-filter').classList.add('hidden');
+                document.getElementById('dashboard-scope-text').innerText = `Unatazama data za tawi la: ${currentUser?.branch}`;
+            }
+
+            const scopedProducts = getScopedProducts();
+            const scopedSales = getScopedSales();
+
+            document.getElementById('dash-total-products').innerText = scopedProducts.length;
+            
             const totalDebt = customers.reduce((sum, c) => sum + Number(c.debt || 0), 0);
             document.getElementById('dash-total-debt').innerText = `TSH ${totalDebt}`;
 
             const startOfDay = new Date();
             startOfDay.setHours(0,0,0,0);
-            const todayTotal = salesHistory.filter(s => (s.timestamp || 0) >= startOfDay.getTime()).reduce((sum, s) => sum + s.total, 0);
+            const todayTotal = scopedSales.filter(s => (s.timestamp || 0) >= startOfDay.getTime()).reduce((sum, s) => sum + s.total, 0);
             document.getElementById('dash-today-sales').innerText = `TSH ${todayTotal}`;
 
-            const lowStockItems = products.filter(p => p.stock <= MIN_STOCK_ALERT);
+            const lowStockItems = scopedProducts.filter(p => p.stock <= MIN_STOCK_ALERT);
             document.getElementById('dash-low-stock-count').innerText = lowStockItems.length;
 
             const lowStockContainer = document.getElementById('low-stock-list');
@@ -1008,7 +1111,7 @@
             } else {
                 lowStockContainer.innerHTML = lowStockItems.map(item => `
                     <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-amber-200">
-                        <span class="font-bold text-gray-800">${item.name} (${item.branch || 'Tawi Kuu'})</span>
+                        <span class="font-bold text-gray-800">${item.name} (${item.branch})</span>
                         <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full font-extrabold text-xs">Zimebaki: ${item.stock}</span>
                     </div>
                 `).join('');
@@ -1047,7 +1150,8 @@
                 startTime = monthStart.getTime();
             }
 
-            const filteredSales = salesHistory.filter(s => (s.timestamp || 0) >= startTime);
+            const scopedSales = getScopedSales();
+            const filteredSales = scopedSales.filter(s => (s.timestamp || 0) >= startTime);
             const totalAmount = filteredSales.reduce((sum, s) => sum + s.total, 0);
             const totalCount = filteredSales.length;
             const avgSale = totalCount > 0 ? Math.round(totalAmount / totalCount) : 0;
@@ -1067,6 +1171,7 @@
                         <div class="flex items-center gap-2">
                             <p class="font-bold text-gray-800">${s.customer}</p>
                             <span class="px-2 py-0.5 text-xs font-semibold rounded ${s.paymentType === 'Credit' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${s.paymentType}</span>
+                            <span class="px-2 py-0.5 text-xs font-bold bg-blue-100 text-blue-800 rounded">${s.branch}</span>
                         </div>
                         <p class="text-xs text-gray-500">${s.date}</p>
                     </div>
@@ -1113,7 +1218,7 @@
         function openRestockModal(index) {
             const p = products[index];
             document.getElementById('restock-prod-index').value = index;
-            document.getElementById('restock-prod-name').innerText = `Bidhaa: ${p.name} (${p.branch || 'Tawi Kuu'} - Stoo: ${p.stock})`;
+            document.getElementById('restock-prod-name').innerText = `Bidhaa: ${p.name} (${p.branch} - Stoo: ${p.stock})`;
             document.getElementById('restock-modal').classList.remove('hidden');
         }
         function closeRestockModal() { document.getElementById('restock-modal').classList.add('hidden'); }
@@ -1129,7 +1234,7 @@
             stockLogs.push({
                 date: new Date().toLocaleString('sw-TZ'),
                 productName: products[index].name,
-                branch: products[index].branch || 'Tawi Kuu',
+                branch: products[index].branch,
                 qtyAdded: qtyAdded,
                 supplier: supplier,
                 addedBy: currentUser ? currentUser.name : 'Admin'
@@ -1173,13 +1278,17 @@
         function saveUser() {
             const name = document.getElementById('new-user-name').value.trim();
             const role = document.getElementById('new-user-role').value;
+            const branch = document.getElementById('new-user-branch').value;
             const pass = document.getElementById('new-user-pass').value.trim();
+
             if (!name || !pass) return alert('Jaza jina na password!');
-            users.push({ name, role, pass });
+
+            users.push({ name, role, branch, pass });
             localStorage.setItem('nma_users', JSON.stringify(users));
             closeUserModal();
             renderUsers();
             populateLoginUsers();
+            alert(`Mtumiaji ${name} ameongezwa kama ${role.toUpperCase()} wa ${branch}`);
         }
 
         function deleteProduct(i) { products.splice(i, 1); localStorage.setItem('nma_products', JSON.stringify(products)); renderAll(); }
