@@ -28,9 +28,9 @@
     <div id="login-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border border-gray-200">
             <div class="text-center mb-6">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-3 text-blue-600 overflow-hidden">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-50 rounded-full mb-3 text-blue-600 overflow-hidden border border-gray-200 shadow-sm">
                     <!-- Nembo ya Kuingilia (Login Logo) -->
-                    <img src="logo.png" alt="Logo" class="w-full h-full object-cover p-2" onerror="this.remove();">
+                    <img id="app-logo-login" alt="NMA 100% Logo" class="w-full h-full object-contain p-1">
                 </div>
                 <h1 class="text-3xl font-extrabold text-gray-800">NMA 100%</h1>
                 <p class="text-sm text-gray-500 mt-1">Ingia Kwenye Mfumo wa Mauzo na Stoo</p>
@@ -76,8 +76,8 @@
         <!-- MOBILE HEADER BAR -->
         <header class="md:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center no-print">
             <div class="flex items-center">
-                <!-- 🟢 LOGO YA SIMU -->
-                <img src="logo.png" alt="NMA Logo" class="h-8 w-auto mr-2 object-contain" onerror="this.style.display='none'">
+                <!-- LOGO YA SIMU -->
+                <img id="app-logo-mobile" alt="NMA Logo" class="h-9 w-auto mr-2 object-contain">
                 <span class="text-lg font-bold text-gray-800">NMA 100%</span>
             </div>
             <button onclick="toggleMobileSidebar()" class="text-gray-600 hover:text-gray-900 focus:outline-none text-2xl">
@@ -90,8 +90,8 @@
             <div>
                 <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200">
                     <div class="flex items-center">
-                        <!-- 🟢 LOGO YA SIDEBAR -->
-                        <img src="logo.png" alt="NMA Logo" class="h-9 w-auto mr-3 object-contain" onerror="this.style.display='none'">
+                        <!-- LOGO YA SIDEBAR -->
+                        <img id="app-logo-sidebar" alt="NMA Logo" class="h-10 w-auto mr-3 object-contain">
                         <span class="text-xl font-bold text-gray-800 tracking-wide">NMA 100%</span>
                     </div>
                 </div>
@@ -633,6 +633,9 @@
 
     <!-- GLOBAL APPLICATION LOGIC -->
     <script>
+        // EMBEDDED LOGO (DATA URI)
+        const APP_LOGO_BASE64 = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAH0AfQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1ldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnA0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnA0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIR00AAAAB9KooqrqGo22mWj3N3KI4x+JPYDuasf/QooqrqGo22mWj3N3KI4x+JPYDuasf";
+
         const MIN_STOCK_ALERT = 3;
 
         let currentUser = null;
@@ -658,6 +661,12 @@
         let currentReportFilter = 'day';
         let html5QrcodeScanner = null;
         let modalQrcodeScanner = null;
+
+        function loadLogos() {
+            document.getElementById('app-logo-login').src = APP_LOGO_BASE64;
+            document.getElementById('app-logo-mobile').src = APP_LOGO_BASE64;
+            document.getElementById('app-logo-sidebar').src = APP_LOGO_BASE64;
+        }
 
         function updateClock() {
             const now = new Date();
@@ -699,6 +708,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            loadLogos();
             const savedUser = JSON.parse(localStorage.getItem('nma_active_user'));
             if (savedUser) {
                 loginUserSession(savedUser);
