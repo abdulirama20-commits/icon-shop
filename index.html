@@ -155,7 +155,6 @@
                     </div>
                 </div>
 
-                <!-- Low Stock Alert Box -->
                 <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <i class="fa-solid fa-triangle-exclamation text-amber-600 text-2xl"></i>
@@ -197,14 +196,23 @@
                     <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between h-full">
                         <div>
                             <h3 class="text-lg font-bold text-gray-800 border-b pb-3 mb-3">Oda ya Sasa</h3>
-                            <div class="mb-4">
+                            
+                            <div class="mb-3">
                                 <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Mteja</label>
                                 <select id="pos-customer" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
                                     <option value="Cash Customer">Mteja wa Kawaida (Cash)</option>
                                 </select>
                             </div>
 
-                            <div id="cart-items" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                            <div class="mb-4">
+                                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Aina ya Malipo</label>
+                                <select id="pos-payment-type" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-gray-50">
+                                    <option value="Cash">Cash / Taslimu</option>
+                                    <option value="Credit">Mkopo (Deni la Mteja)</option>
+                                </select>
+                            </div>
+
+                            <div id="cart-items" class="space-y-3 max-h-52 overflow-y-auto pr-1">
                                 <p class="text-sm text-gray-400 text-center py-6">Hakuna bidhaa kwenye kikapu.</p>
                             </div>
                         </div>
@@ -249,12 +257,12 @@
                 </div>
             </section>
 
-            <!-- STOCK LOGS SECTION (ADMIN ONLY) -->
+            <!-- STOCK LOGS SECTION -->
             <section id="section-stock-logs" class="tab-content hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800">Kumbukumbu za Mzigo Ulrioingizwa (Stock Logs)</h2>
-                        <p class="text-xs text-gray-500">Orodha ya kina ya bidhaa zote zilizowahi kuingizwa kwenye mfumo na Admin.</p>
+                        <p class="text-xs text-gray-500">Orodha ya kina ya bidhaa zote zilizowahi kuingizwa kwenye mfumo.</p>
                     </div>
                 </div>
 
@@ -323,10 +331,39 @@
                 </div>
             </section>
 
-            <!-- REPORTS SECTION -->
+            <!-- REPORTS SECTION (DAILY / WEEKLY / MONTHLY) -->
             <section id="section-reports" class="tab-content hidden space-y-6">
-                <h2 class="text-2xl font-bold text-gray-800">Ripoti za Mauzo</h2>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Ripoti za Mauzo</h2>
+                        <p class="text-xs text-gray-500">Chagua kipindi kuona ripoti na uchanganuzi wa mauzo.</p>
+                    </div>
+                    <!-- Report Filter Buttons -->
+                    <div class="inline-flex rounded-lg bg-gray-200 p-1">
+                        <button onclick="setReportFilter('day')" id="btn-report-day" class="px-4 py-1.5 text-xs font-bold rounded-md bg-white text-blue-600 shadow transition">Siku (Leo)</button>
+                        <button onclick="setReportFilter('week')" id="btn-report-week" class="px-4 py-1.5 text-xs font-bold rounded-md text-gray-600 hover:text-gray-900 transition">Wiki Hii</button>
+                        <button onclick="setReportFilter('month')" id="btn-report-month" class="px-4 py-1.5 text-xs font-bold rounded-md text-gray-600 hover:text-gray-900 transition">Mwezi Huu</button>
+                    </div>
+                </div>
+
+                <!-- Report Summary Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                        <p class="text-xs font-semibold text-gray-500 uppercase">Jumla ya Mauzo</p>
+                        <h3 id="report-total-amount" class="text-2xl font-extrabold text-emerald-600 mt-1">TSH 0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                        <p class="text-xs font-semibold text-gray-500 uppercase">Idadi ya Miamala</p>
+                        <h3 id="report-total-count" class="text-2xl font-extrabold text-blue-600 mt-1">0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                        <p class="text-xs font-semibold text-gray-500 uppercase">Wastani kwa Muamala</p>
+                        <h3 id="report-avg-sale" class="text-2xl font-extrabold text-purple-600 mt-1">TSH 0</h3>
+                    </div>
+                </div>
+
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Orodha ya Mauzo Kulingana na Filter</h3>
                     <div id="sales-history" class="space-y-3"></div>
                 </div>
             </section>
@@ -369,6 +406,7 @@
             <p class="text-xs">Simu: +255 123 456 789</p>
             <p class="text-xs" id="receipt-date"></p>
             <p class="text-xs font-bold mt-1" id="receipt-customer"></p>
+            <p class="text-xs font-semibold text-gray-600" id="receipt-type"></p>
         </div>
         <table class="w-full text-left mb-3">
             <thead>
@@ -493,6 +531,7 @@
         let salesHistory = JSON.parse(localStorage.getItem('nma_sales')) || [];
         let stockLogs = JSON.parse(localStorage.getItem('nma_stock_logs')) || [];
         let cart = [];
+        let currentReportFilter = 'day'; // 'day', 'week', 'month'
         let html5QrcodeScanner = null;
         let modalQrcodeScanner = null;
 
@@ -804,8 +843,14 @@
             if (cart.length === 0) return alert('Weka bidhaa kwenye kikapu kwanza!');
 
             const customerName = document.getElementById('pos-customer').value;
+            const paymentType = document.getElementById('pos-payment-type').value;
             const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
+            if (paymentType === 'Credit' && customerName === 'Cash Customer') {
+                return alert('Huwezi kuuza kwa mkopo kwa "Mteja wa Kawaida"! Tafadhali chagua mteja maalum aliyesajiliwa.');
+            }
+
+            // Punguza stock
             let triggeredLowStock = [];
             cart.forEach(cartItem => {
                 const p = products.find(prod => prod.barcode === cartItem.barcode);
@@ -817,6 +862,15 @@
                 }
             });
 
+            // Kama umeuza kwa mkopo, ongeza deni kwa mteja
+            if (paymentType === 'Credit') {
+                const targetCustomer = customers.find(c => c.name === customerName);
+                if (targetCustomer) {
+                    targetCustomer.debt = (Number(targetCustomer.debt) || 0) + total;
+                    localStorage.setItem('nma_customers', JSON.stringify(customers));
+                }
+            }
+
             if (triggeredLowStock.length > 0) {
                 playAlarmSound();
                 alert(`ALARM TAARIFA: Bidhaa zifuatazo zimebaki chache sana stoo:\n\n` + triggeredLowStock.join('\n'));
@@ -824,8 +878,10 @@
 
             const saleRecord = {
                 id: Date.now(),
+                timestamp: Date.now(),
                 date: new Date().toLocaleString('sw-TZ'),
                 customer: customerName,
+                paymentType: paymentType,
                 items: [...cart],
                 total: total
             };
@@ -844,6 +900,7 @@
         function triggerReceiptPrint(sale) {
             document.getElementById('receipt-date').innerText = sale.date;
             document.getElementById('receipt-customer').innerText = `Mteja: ${sale.customer}`;
+            document.getElementById('receipt-type').innerText = `Aina: ${sale.paymentType === 'Credit' ? 'MKOPO (DENI)' : 'TASLIMU (CASH)'}`;
             
             const tbody = document.getElementById('receipt-items-body');
             tbody.innerHTML = sale.items.map(i => `
@@ -902,7 +959,14 @@
             const totalDebt = customers.reduce((sum, c) => sum + Number(c.debt || 0), 0);
             document.getElementById('dash-total-debt').innerText = `TSH ${totalDebt}`;
 
-            const todayTotal = salesHistory.reduce((sum, s) => sum + s.total, 0);
+            // Mauzo ya Leo pekee
+            const startOfDay = new Date();
+            startOfDay.setHours(0,0,0,0);
+
+            const todayTotal = salesHistory
+                .filter(s => (s.timestamp || 0) >= startOfDay.getTime())
+                .reduce((sum, s) => sum + s.total, 0);
+
             document.getElementById('dash-today-sales').innerText = `TSH ${todayTotal}`;
 
             const lowStockItems = products.filter(p => p.stock <= MIN_STOCK_ALERT);
@@ -923,17 +987,70 @@
             }
         }
 
+        // --- FILTER FOR REPORT (DAILY / WEEKLY / MONTHLY) ---
+        function setReportFilter(type) {
+            currentReportFilter = type;
+            
+            const btnDay = document.getElementById('btn-report-day');
+            const btnWeek = document.getElementById('btn-report-week');
+            const btnMonth = document.getElementById('btn-report-month');
+
+            const activeClasses = 'bg-white text-blue-600 shadow';
+            const inactiveClasses = 'text-gray-600 hover:text-gray-900';
+
+            btnDay.className = `px-4 py-1.5 text-xs font-bold rounded-md transition ${type === 'day' ? activeClasses : inactiveClasses}`;
+            btnWeek.className = `px-4 py-1.5 text-xs font-bold rounded-md transition ${type === 'week' ? activeClasses : inactiveClasses}`;
+            btnMonth.className = `px-4 py-1.5 text-xs font-bold rounded-md transition ${type === 'month' ? activeClasses : inactiveClasses}`;
+
+            renderSalesHistory();
+        }
+
         function renderSalesHistory() {
             const container = document.getElementById('sales-history');
-            if (salesHistory.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm">Bado hakuna kumbukumbu za mauzo.</p>`;
+            
+            const now = new Date();
+            let startTime = 0;
+
+            if (currentReportFilter === 'day') {
+                const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                startTime = dayStart.getTime();
+            } else if (currentReportFilter === 'week') {
+                const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+                weekStart.setHours(0,0,0,0);
+                startTime = weekStart.getTime();
+            } else if (currentReportFilter === 'month') {
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                startTime = monthStart.getTime();
+            }
+
+            const filteredSales = salesHistory.filter(s => {
+                if (!s.timestamp) return true; // Support backup files/old entries
+                return s.timestamp >= startTime;
+            });
+
+            // Update Summary Cards in Reports Section
+            const totalAmount = filteredSales.reduce((sum, s) => sum + s.total, 0);
+            const totalCount = filteredSales.length;
+            const avgSale = totalCount > 0 ? Math.round(totalAmount / totalCount) : 0;
+
+            document.getElementById('report-total-amount').innerText = `TSH ${totalAmount}`;
+            document.getElementById('report-total-count').innerText = totalCount;
+            document.getElementById('report-avg-sale').innerText = `TSH ${avgSale}`;
+
+            if (filteredSales.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-sm">Hakuna kumbukumbu za mauzo kwenye kipindi hiki.</p>`;
                 return;
             }
 
-            container.innerHTML = salesHistory.map(s => `
+            container.innerHTML = [...filteredSales].reverse().map(s => `
                 <div class="p-4 border rounded-xl flex justify-between items-center bg-gray-50">
                     <div>
-                        <p class="font-bold text-gray-800">${s.customer}</p>
+                        <div class="flex items-center gap-2">
+                            <p class="font-bold text-gray-800">${s.customer}</p>
+                            <span class="px-2 py-0.5 text-xs font-semibold rounded ${s.paymentType === 'Credit' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
+                                ${s.paymentType === 'Credit' ? 'Mkopo' : 'Cash'}
+                            </span>
+                        </div>
                         <p class="text-xs text-gray-500">${s.date}</p>
                     </div>
                     <span class="font-bold text-emerald-600 text-lg">TSH ${s.total}</span>
