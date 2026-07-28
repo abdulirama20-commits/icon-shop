@@ -36,16 +36,25 @@
             </div>
 
             <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <!-- 1. CHAGUA TAWI FIRST -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Chagua Mtumiaji</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-1"><i class="fa-solid fa-code-branch text-blue-600 mr-1"></i> Chagua Tawi</label>
+                    <select id="login-branch-select" onchange="onLoginBranchChange()" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50 font-semibold"></select>
+                </div>
+
+                <!-- 2. CHAGUA MTUMIAJI (FILTERED BY BRANCH) -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1"><i class="fa-solid fa-user text-blue-600 mr-1"></i> Chagua Mtumiaji / Mhudumu</label>
                     <select id="login-user-select" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                 </div>
+
+                <!-- 3. WEKA PASSWORD -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Neno la Siri (Password)</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-1"><i class="fa-solid fa-lock text-blue-600 mr-1"></i> Neno la Siri (Password)</label>
                     <input type="password" id="login-password" required placeholder="Weka Neno la Siri" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
                 
-                <!-- OPTION YA REMEMBER ME -->
+                <!-- REMEMBER ME -->
                 <div class="flex items-center justify-between">
                     <label class="flex items-center cursor-pointer text-sm text-gray-600">
                         <input type="checkbox" id="remember-me" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 mr-2">
@@ -82,7 +91,7 @@
                     <div>
                         <p class="text-xs text-gray-500 uppercase font-semibold">Mtumiaji Aliyeingia</p>
                         <p id="current-user-display" class="text-sm font-bold text-gray-800">Admin</p>
-                        <p id="current-user-branch" class="text-[10px] text-blue-600 font-semibold"></p>
+                        <p id="current-user-branch" class="text-xs text-blue-600 font-bold">Tawi Kuu</p>
                     </div>
                     <span id="role-badge" class="px-2 py-0.5 text-[10px] font-semibold bg-blue-100 text-blue-800 rounded-full">ADMIN</span>
                 </div>
@@ -93,9 +102,9 @@
                         <span>Dashboard</span>
                     </button>
 
-                    <!-- TAB YA MATAWI (BRANCHES) -->
-                    <button onclick="switchTab('branches')" id="nav-branches" class="super-admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
-                        <i class="fa-solid fa-code-branch w-6 text-gray-500"></i>
+                    <!-- TAB YA MATAWI (BRANCHES) - IPO PERMANENT -->
+                    <button onclick="switchTab('branches')" id="nav-branches" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition font-semibold text-blue-600">
+                        <i class="fa-solid fa-code-branch w-6 text-blue-600"></i>
                         <span>Matawi (Branches)</span>
                     </button>
 
@@ -104,32 +113,32 @@
                         <span>Sales (POS)</span>
                     </button>
 
-                    <button onclick="switchTab('products')" id="nav-products" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('products')" id="nav-products" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-box w-6 text-gray-500"></i>
                         <span>Products & Stock</span>
                     </button>
 
-                    <button onclick="switchTab('stock-logs')" id="nav-stock-logs" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('stock-logs')" id="nav-stock-logs" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-truck-ramp-box w-6 text-gray-500"></i>
                         <span>Kumbukumbu za Mzigo</span>
                     </button>
 
-                    <button onclick="switchTab('customers')" id="nav-customers" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('customers')" id="nav-customers" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-users w-6 text-gray-500"></i>
                         <span>Wateja (Customers)</span>
                     </button>
 
-                    <button onclick="switchTab('suppliers')" id="nav-suppliers" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('suppliers')" id="nav-suppliers" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-truck-field w-6 text-gray-500"></i>
                         <span>Wasambazaji</span>
                     </button>
 
-                    <button onclick="switchTab('reports')" id="nav-reports" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('reports')" id="nav-reports" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-file-invoice-dollar w-6 text-gray-500"></i>
                         <span>Ripoti za Mauzo</span>
                     </button>
 
-                    <button onclick="switchTab('users')" id="nav-users" class="super-admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('users')" id="nav-users" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-user-gear w-6 text-gray-500"></i>
                         <span>Watumiaji & Passwords</span>
                     </button>
@@ -154,7 +163,7 @@
                         <p id="dashboard-scope-text" class="text-xs text-blue-600 font-semibold mt-1"></p>
                     </div>
 
-                    <div id="super-admin-branch-filter" class="hidden flex items-center gap-2 bg-white p-2 border rounded-xl shadow-sm">
+                    <div class="flex items-center gap-2 bg-white p-2 border rounded-xl shadow-sm">
                         <label class="text-xs font-bold text-gray-600"><i class="fa-solid fa-filter mr-1"></i>Chuja Tawi:</label>
                         <select id="dash-branch-filter" onchange="renderDashboard()" class="text-sm font-semibold bg-gray-50 p-1.5 border rounded-lg focus:outline-none">
                             <option value="ALL">Matawi Yote (All Branches)</option>
@@ -195,10 +204,10 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800">Usimamizi wa Matawi (Branches)</h2>
-                        <p class="text-xs text-gray-500">Super Admin pekee ndiye anayeweza kuongeza na kusimamia matawi.</p>
+                        <p class="text-xs text-gray-500">Ongeza Matawi na kuteua ma-Admin pamoja na Cashier hapo hapo.</p>
                     </div>
                     <button onclick="openBranchModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700">
-                        <i class="fa-solid fa-plus mr-1"></i> Ongeza Tawi Jipya
+                        <i class="fa-solid fa-plus mr-1"></i> Ongeza Tawi & Admin Jipya
                     </button>
                 </div>
 
@@ -208,7 +217,7 @@
                             <tr>
                                 <th class="p-4">Jina la Tawi</th>
                                 <th class="p-4">Eneo / Anwani</th>
-                                <th class="p-4 text-center">Njia ya Mkato</th>
+                                <th class="p-4">Admin wa Tawi</th>
                                 <th class="p-4 text-center">Kitendo</th>
                             </tr>
                         </thead>
@@ -420,10 +429,10 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800">Usimamizi wa Watumiaji</h2>
-                        <p class="text-xs text-gray-500">Super Admin anaweza kuteua Branch Admin na Cashier kwa kila tawi.</p>
+                        <p class="text-xs text-gray-500">Orodha ya ma-Admin na Cashiers wote kwa kila tawi.</p>
                     </div>
                     <button onclick="openUserModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700">
-                        <i class="fa-solid fa-user-plus mr-1"></i> Ongeza Mtumiaji
+                        <i class="fa-solid fa-user-plus mr-1"></i> Ongeza Mtumiaji Mpya
                     </button>
                 </div>
 
@@ -474,15 +483,31 @@
     </div>
 
     <!-- MODALS -->
-    <!-- BRANCH MODAL -->
+    
+    <!-- BRANCH MODAL WITH INTEGRATED USER CREATION -->
     <div id="branch-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
-            <h3 class="text-lg font-bold text-gray-800">Ongeza Tawi Jipya</h3>
-            <input type="text" id="branch-name" placeholder="Jina la Tawi (Mf: Tawi la Kariakoo)" class="w-full p-2 border rounded-lg">
-            <input type="text" id="branch-location" placeholder="Eneo / Anwani (Mf: Mtaa wa Aggrey)" class="w-full p-2 border rounded-lg">
-            <div class="flex justify-end gap-2">
-                <button onclick="closeBranchModal()" class="px-4 py-2 border rounded-lg">Ghairi</button>
-                <button onclick="saveBranch()" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Hifadhi Tawi</button>
+            <h3 class="text-lg font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-code-branch text-blue-600 mr-2"></i>Ongeza Tawi Jipya & Mtumiaji</h3>
+            
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-gray-600 uppercase">1. Taarifa za Tawi</label>
+                <input type="text" id="branch-name" placeholder="Jina la Tawi (Mf: Tawi la Kariakoo)" class="w-full p-2 border rounded-lg text-sm">
+                <input type="text" id="branch-location" placeholder="Eneo / Anwani (Mf: Mtaa wa Aggrey)" class="w-full p-2 border rounded-lg text-sm">
+            </div>
+
+            <div class="space-y-2 pt-2 border-t">
+                <label class="block text-xs font-bold text-gray-600 uppercase">2. Mtumiaji wa Tawi Hili</label>
+                <input type="text" id="branch-admin-name" placeholder="Jina la Admin/Mhudumu wa Tawi" class="w-full p-2 border rounded-lg text-sm">
+                <select id="branch-admin-role" class="w-full p-2 border rounded-lg text-sm bg-gray-50 font-semibold">
+                    <option value="admin">Admin wa Tawi (Branch Admin)</option>
+                    <option value="cashier">Mhudumu (Cashier)</option>
+                </select>
+                <input type="password" id="branch-admin-pass" placeholder="Password ya Mtumiaji Huyu" class="w-full p-2 border rounded-lg text-sm">
+            </div>
+
+            <div class="flex justify-end gap-2 border-t pt-3">
+                <button onclick="closeBranchModal()" class="px-4 py-2 border rounded-lg text-sm">Ghairi</button>
+                <button onclick="saveBranch()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold"><i class="fa-solid fa-check mr-1"></i> Hifadhi Tawi</button>
             </div>
         </div>
     </div>
@@ -629,18 +654,34 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        function populateLoginUsers() {
-            const select = document.getElementById('login-user-select');
-            select.innerHTML = users.map(u => `<option value="${u.name}">${u.name} (${u.role.toUpperCase()} - ${u.branch})</option>`).join('');
+        // 1. POPULATE BRANCHES ON LOGIN DROPDOWN
+        function populateLoginBranches() {
+            const branchSelect = document.getElementById('login-branch-select');
+            branchSelect.innerHTML = `<option value="ALL">--- Matawi Yote / Super Admin ---</option>` +
+                branches.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+            
+            onLoginBranchChange();
         }
 
-        // KUKAGUA KAMA KUNA REMEMBER ME ILIYOHIFADHIWA
+        // 2. WHEN BRANCH SELECT IS CHANGED, FILTER USERS FOR THAT BRANCH ONLY
+        function onLoginBranchChange() {
+            const selectedBranch = document.getElementById('login-branch-select').value;
+            const userSelect = document.getElementById('login-user-select');
+
+            let filteredUsers = users;
+            if (selectedBranch !== 'ALL') {
+                filteredUsers = users.filter(u => u.branch === selectedBranch || u.role === 'superadmin');
+            }
+
+            userSelect.innerHTML = filteredUsers.map(u => `<option value="${u.name}">${u.name} (${u.role.toUpperCase()})</option>`).join('');
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = JSON.parse(localStorage.getItem('nma_active_user'));
             if (savedUser) {
                 loginUserSession(savedUser);
             } else {
-                populateLoginUsers();
+                populateLoginBranches();
             }
         });
 
@@ -654,7 +695,6 @@
 
             if (foundUser) {
                 if (rememberMe) {
-                    // Inahifadhi mtumiaji akitick "Nikumbuke"
                     localStorage.setItem('nma_active_user', JSON.stringify(foundUser));
                 }
                 loginUserSession(foundUser);
@@ -667,32 +707,20 @@
             currentUser = user;
             document.getElementById('login-overlay').classList.add('hidden');
             document.getElementById('current-user-display').innerText = user.name;
-            document.getElementById('current-user-branch').innerText = user.branch === 'ALL' ? 'Matawi Yote' : user.branch;
+            document.getElementById('current-user-branch').innerText = user.branch === 'ALL' ? 'Matawi Yote' : (user.branch || 'Tawi Kuu');
             document.getElementById('role-badge').innerText = user.role.toUpperCase();
 
-            // RUKSA NA SISI ZA MENUS (PERMISSIONS)
-            if (user.role === 'cashier') {
-                document.querySelectorAll('.admin-only, .super-admin-only').forEach(el => el.classList.add('hidden'));
-                switchTab('pos');
-            } else if (user.role === 'admin') {
-                document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-                document.querySelectorAll('.super-admin-only').forEach(el => el.classList.add('hidden'));
-                switchTab('dashboard');
-            } else if (user.role === 'superadmin') {
-                document.querySelectorAll('.admin-only, .super-admin-only').forEach(el => el.classList.remove('hidden'));
-                switchTab('dashboard');
-            }
-            
+            switchTab('dashboard');
             renderAll();
         }
 
         function handleLogout() {
             currentUser = null;
-            localStorage.removeItem('nma_active_user'); // Inafuta akaunti tu ukibonyeza Logout
+            localStorage.removeItem('nma_active_user');
             document.getElementById('login-overlay').classList.remove('hidden');
             document.getElementById('login-password').value = '';
             document.getElementById('remember-me').checked = false;
-            populateLoginUsers();
+            populateLoginBranches();
         }
 
         function switchTab(tabId) {
@@ -718,20 +746,38 @@
         function openBranchModal() { document.getElementById('branch-modal').classList.remove('hidden'); }
         function closeBranchModal() { document.getElementById('branch-modal').classList.add('hidden'); }
         
+        // HIFADHI TAWI NA MTUMIAJI WAKE HAPO HAPO
         function saveBranch() {
             const name = document.getElementById('branch-name').value.trim();
             const location = document.getElementById('branch-location').value.trim();
+            const adminName = document.getElementById('branch-admin-name').value.trim();
+            const adminRole = document.getElementById('branch-admin-role').value;
+            const adminPass = document.getElementById('branch-admin-pass').value.trim();
 
             if (!name) return alert('Tafadhali weka jina la tawi!');
 
             branches.push({ name, location });
             localStorage.setItem('nma_branches', JSON.stringify(branches));
 
+            if (adminName && adminPass) {
+                users.push({
+                    name: adminName,
+                    role: adminRole,
+                    branch: name,
+                    pass: adminPass
+                });
+                localStorage.setItem('nma_users', JSON.stringify(users));
+            }
+
             document.getElementById('branch-name').value = '';
             document.getElementById('branch-location').value = '';
+            document.getElementById('branch-admin-name').value = '';
+            document.getElementById('branch-admin-pass').value = '';
+
             closeBranchModal();
             renderAll();
-            alert('Tawi limeongezwa kwa mafanikio!');
+            populateLoginBranches();
+            alert('Tawi na Mtumiaji vimeongezwa kwa mafanikio!');
         }
 
         function deleteBranch(index) {
@@ -739,30 +785,24 @@
             branches.splice(index, 1);
             localStorage.setItem('nma_branches', JSON.stringify(branches));
             renderAll();
+            populateLoginBranches();
         }
 
         function renderBranches() {
             const tbody = document.getElementById('branches-table-body');
-            tbody.innerHTML = branches.map((b, index) => `
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-bold text-gray-800">${b.name}</td>
-                    <td class="p-4 text-gray-600">${b.location || 'N/A'}</td>
-                    <td class="p-4 text-center">
-                        <button onclick="quickAddProductForBranch('${b.name}')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded-lg text-xs font-bold transition">
-                            <i class="fa-solid fa-plus mr-1"></i> Ongeza Bidhaa
-                        </button>
-                    </td>
-                    <td class="p-4 text-center">
-                        <button onclick="deleteBranch(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function quickAddProductForBranch(branchName) {
-            switchTab('products');
-            openProductModal();
-            document.getElementById('prod-branch-select').value = branchName;
+            tbody.innerHTML = branches.map((b, index) => {
+                const branchAdmin = users.find(u => u.branch === b.name);
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-bold text-gray-800">${b.name}</td>
+                        <td class="p-4 text-gray-600">${b.location || 'N/A'}</td>
+                        <td class="p-4"><span class="px-2 py-1 bg-blue-50 text-blue-800 rounded font-bold text-xs">${branchAdmin ? branchAdmin.name : 'Hana Admin'}</span></td>
+                        <td class="p-4 text-center">
+                            <button onclick="deleteBranch(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function updateBranchDropdowns() {
@@ -783,7 +823,7 @@
         }
 
         function getScopedProducts() {
-            if (!currentUser) return [];
+            if (!currentUser) return products;
             if (currentUser.role === 'superadmin') {
                 const filter = document.getElementById('dash-branch-filter')?.value || 'ALL';
                 return filter === 'ALL' ? products : products.filter(p => p.branch === filter);
@@ -792,7 +832,7 @@
         }
 
         function getScopedSales() {
-            if (!currentUser) return [];
+            if (!currentUser) return salesHistory;
             if (currentUser.role === 'superadmin') {
                 const filter = document.getElementById('dash-branch-filter')?.value || 'ALL';
                 return filter === 'ALL' ? salesHistory : salesHistory.filter(s => s.branch === filter);
@@ -826,7 +866,7 @@
                 users[index].pass = newPass.trim();
                 localStorage.setItem('nma_users', JSON.stringify(users));
                 renderUsers();
-                populateLoginUsers();
+                populateLoginBranches();
                 alert(`Password ya ${users[index].name} imebadilishwa!`);
             }
         }
@@ -1033,7 +1073,7 @@
                 }
             }
 
-            const activeBranch = currentUser.role === 'superadmin' ? (cart[0]?.branch || 'Tawi Kuu') : currentUser.branch;
+            const activeBranch = currentUser ? (currentUser.branch === 'ALL' ? (cart[0]?.branch || 'Tawi Kuu') : currentUser.branch) : 'Tawi Kuu';
 
             const saleRecord = {
                 id: Date.now(),
@@ -1108,16 +1148,10 @@
         }
 
         function renderDashboard() {
-            if (currentUser?.role === 'superadmin') {
-                document.getElementById('super-admin-branch-filter').classList.remove('hidden');
-                document.getElementById('dashboard-scope-text').innerText = 'Unatazama data za matawi kulingana na filter hapa kulia.';
-            } else {
-                document.getElementById('super-admin-branch-filter').classList.add('hidden');
-                document.getElementById('dashboard-scope-text').innerText = `Unatazama data za tawi la: ${currentUser?.branch}`;
-            }
-
             const scopedProducts = getScopedProducts();
             const scopedSales = getScopedSales();
+
+            document.getElementById('dashboard-scope-text').innerText = `Unatazama data za tawi la: ${currentUser ? (currentUser.branch === 'ALL' ? 'Matawi Yote' : currentUser.branch) : 'Tawi Kuu'}`;
 
             document.getElementById('dash-total-products').innerText = scopedProducts.length;
             
@@ -1314,14 +1348,14 @@
             localStorage.setItem('nma_users', JSON.stringify(users));
             closeUserModal();
             renderUsers();
-            populateLoginUsers();
-            alert(`Mtumiaji ${name} ameongezwa kama ${role.toUpperCase()} wa ${branch}`);
+            populateLoginBranches();
+            alert(`Mtumiaji ${name} ameongezwa kwa mafanikio!`);
         }
 
         function deleteProduct(i) { products.splice(i, 1); localStorage.setItem('nma_products', JSON.stringify(products)); renderAll(); }
         function deleteCustomer(i) { customers.splice(i, 1); localStorage.setItem('nma_customers', JSON.stringify(customers)); renderAll(); }
         function deleteSupplier(i) { suppliers.splice(i, 1); localStorage.setItem('nma_suppliers', JSON.stringify(suppliers)); renderAll(); }
-        function deleteUser(i) { users.splice(i, 1); localStorage.setItem('nma_users', JSON.stringify(users)); renderUsers(); populateLoginUsers(); }
+        function deleteUser(i) { users.splice(i, 1); localStorage.setItem('nma_users', JSON.stringify(users)); renderUsers(); populateLoginBranches(); }
     </script>
 </body>
 </html>
