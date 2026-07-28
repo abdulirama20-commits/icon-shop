@@ -45,7 +45,7 @@
                     <input type="password" id="login-password" required placeholder="Weka Neno la Siri" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition duration-200 shadow-md">
-                    <i class="fa-solid fa-right-to-bracket mr-2"></i> Ingia
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i> Ingia Kwenye Mfumo
                 </button>
             </form>
         </div>
@@ -144,7 +144,7 @@
                         <p id="dashboard-scope-text" class="text-xs text-blue-600 font-semibold mt-1"></p>
                     </div>
 
-                    <!-- Branch Selector Filter (Visible to Super Admin only) -->
+                    <!-- Branch Selector Filter -->
                     <div id="super-admin-branch-filter" class="hidden flex items-center gap-2 bg-white p-2 border rounded-xl shadow-sm">
                         <label class="text-xs font-bold text-gray-600"><i class="fa-solid fa-filter mr-1"></i>Chuja Tawi:</label>
                         <select id="dash-branch-filter" onchange="renderDashboard()" class="text-sm font-semibold bg-gray-50 p-1.5 border rounded-lg focus:outline-none">
@@ -557,7 +557,7 @@
         </div>
     </div>
 
-    <!-- USER MODAL (SUPPORTING BRANCH APPOINTMENT) -->
+    <!-- USER MODAL -->
     <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
             <h3 class="text-lg font-bold text-gray-800">Ongeza Mtumiaji Mpya</h3>
@@ -582,13 +582,12 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC WITH AUTO REMEMBER ME -->
     <script>
         const MIN_STOCK_ALERT = 3;
 
         let currentUser = null;
         
-        // Default users configuration
         let users = JSON.parse(localStorage.getItem('nma_users')) || [
             { name: 'Boss Admin', role: 'superadmin', branch: 'ALL', pass: 'admin123' },
             { name: 'Admin Kariakoo', role: 'admin', branch: 'Tawi la Kariakoo', pass: '1234' },
@@ -626,6 +625,17 @@
             select.innerHTML = users.map(u => `<option value="${u.name}">${u.name} (${u.role.toUpperCase()} - ${u.branch})</option>`).join('');
         }
 
+        // AUTO-LOGIN CHECK (REMEMBER ME FUNCTIONALITY)
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = JSON.parse(localStorage.getItem('nma_active_user'));
+            if (savedUser) {
+                // Kama kuna mtumiaji alihifadhiwa kabla, anaingia moja kwa moja
+                loginUserSession(savedUser);
+            } else {
+                populateLoginUsers();
+            }
+        });
+
         function handleLogin(e) {
             e.preventDefault();
             const username = document.getElementById('login-user-select').value;
@@ -634,33 +644,41 @@
             const foundUser = users.find(u => u.name === username && u.pass === pass);
 
             if (foundUser) {
-                currentUser = foundUser;
-                document.getElementById('login-overlay').classList.add('hidden');
-                document.getElementById('current-user-display').innerText = foundUser.name;
-                document.getElementById('current-user-branch').innerText = foundUser.branch === 'ALL' ? 'Matawi Yote' : foundUser.branch;
-                document.getElementById('role-badge').innerText = foundUser.role.toUpperCase();
-
-                // Permissions logic
-                if (foundUser.role === 'cashier') {
-                    document.querySelectorAll('.admin-only, .super-admin-only').forEach(el => el.classList.add('hidden'));
-                    switchTab('pos');
-                } else if (foundUser.role === 'admin') {
-                    document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-                    document.querySelectorAll('.super-admin-only').forEach(el => el.classList.add('hidden'));
-                    switchTab('dashboard');
-                } else if (foundUser.role === 'superadmin') {
-                    document.querySelectorAll('.admin-only, .super-admin-only').forEach(el => el.classList.remove('hidden'));
-                    switchTab('dashboard');
-                }
-                
-                renderAll();
+                // Inahifadhi akaunti kwenye LocalStorage ili asitolewe tena
+                localStorage.setItem('nma_active_user', JSON.stringify(foundUser));
+                loginUserSession(foundUser);
             } else {
                 alert('Neno la siri (password) sio sahihi!');
             }
         }
 
+        function loginUserSession(user) {
+            currentUser = user;
+            document.getElementById('login-overlay').classList.add('hidden');
+            document.getElementById('current-user-display').innerText = user.name;
+            document.getElementById('current-user-branch').innerText = user.branch === 'ALL' ? 'Matawi Yote' : user.branch;
+            document.getElementById('role-badge').innerText = user.role.toUpperCase();
+
+            // Permissions logic
+            if (user.role === 'cashier') {
+                document.querySelectorAll('.admin-only, .super-admin-only').forEach(el => el.classList.add('hidden'));
+                switchTab('pos');
+            } else if (user.role === 'admin') {
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+                document.querySelectorAll('.super-admin-only').forEach(el => el.classList.add('hidden'));
+                switchTab('dashboard');
+            } else if (user.role === 'superadmin') {
+                document.querySelectorAll('.admin-only, .super-admin-only').forEach(el => el.classList.remove('hidden'));
+                switchTab('dashboard');
+            }
+            
+            renderAll();
+        }
+
         function handleLogout() {
             currentUser = null;
+            // Inafuta kumbukumbu tu akibonyeza LOGOUT mwenyewe
+            localStorage.removeItem('nma_active_user');
             document.getElementById('login-overlay').classList.remove('hidden');
             document.getElementById('login-password').value = '';
             populateLoginUsers();
@@ -754,7 +772,7 @@
             }
         }
 
-        // --- SCOPED DATA HELPER (Branch Filtering) ---
+        // --- SCOPED DATA HELPER ---
         function getScopedProducts() {
             if (!currentUser) return [];
             if (currentUser.role === 'superadmin') {
@@ -1295,9 +1313,6 @@
         function deleteCustomer(i) { customers.splice(i, 1); localStorage.setItem('nma_customers', JSON.stringify(customers)); renderAll(); }
         function deleteSupplier(i) { suppliers.splice(i, 1); localStorage.setItem('nma_suppliers', JSON.stringify(suppliers)); renderAll(); }
         function deleteUser(i) { users.splice(i, 1); localStorage.setItem('nma_users', JSON.stringify(users)); renderUsers(); populateLoginUsers(); }
-
-        populateLoginUsers();
-        renderAll();
     </script>
 </body>
 </html>
