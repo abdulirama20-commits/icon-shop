@@ -1,748 +1,734 @@
 <!DOCTYPE html>
 <html lang="sw">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NMA 100%</title>
-  
-  <!-- HTML5 QR CODE SCANNER LIBRARY -->
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NMA 100% - Inventory Management System</title>
 
-  <style>
-    :root {
-      --bg-main: #f7f3ec;
-      --bg-card: #ffffff;
-      --accent-brown: #733e0a;
-      --accent-brown-hover: #582f07;
-      --text-dark: #2c241d;
-      --text-muted: #8c827a;
-      --border-color: #eee9e0;
-      --danger-red: #ef4444;
-      --success-green: #16a34a;
-    }
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Html5-Qrcode Library for Mobile Camera Barcode Scanning -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
-    * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
-    body { background-color: var(--bg-main); color: var(--text-dark); display: flex; min-height: 100vh; }
-
-    /* SIDEBAR */
-    .sidebar { width: 250px; background: var(--bg-main); padding: 20px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-    .brand { font-size: 1.3rem; font-weight: 800; color: var(--accent-brown); padding-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-color); margin-bottom: 10px; }
-    .nav-item { padding: 12px 16px; border-radius: 12px; font-weight: 600; color: var(--text-dark); text-decoration: none; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
-    .nav-item:hover, .nav-item.active { background: #efe8dc; color: var(--accent-brown); }
-
-    /* MAIN CONTENT */
-    .main-content { flex: 1; padding: 25px; overflow-y: auto; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .top-bar h1 { font-size: 1.6rem; font-weight: 800; }
-    .subtitle { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
-
-    /* CARDS & TABLES */
-    .card { background: var(--bg-card); padding: 22px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); margin-bottom: 20px; border: 1px solid var(--border-color); }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-    .stat-card { background: var(--bg-card); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); }
-    .stat-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
-    .stat-value { font-size: 1.6rem; font-weight: 800; margin-top: 8px; }
-
-    /* FORMS & INPUTS */
-    .form-group { margin-bottom: 15px; }
-    label { font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; display: block; color: var(--text-dark); }
-    input, select { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 0.95rem; background: #faf8f5; outline: none; }
-    input:focus, select:focus { border-color: var(--accent-brown); background: #fff; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
-    /* BUTTONS */
-    .btn-brown { background: var(--accent-brown); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 5px; }
-    .btn-brown:hover { background: var(--accent-brown-hover); }
-    .btn-secondary { background: #6b7280; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .btn-edit { background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-right: 5px; }
-    .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-
-    /* TABLES */
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th { text-align: left; padding: 12px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
-    td { padding: 14px 12px; font-size: 0.9rem; border-bottom: 1px solid #f9f8f6; }
-    .badge-low { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; }
-    .badge-ok { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; }
-
-    /* ALERT BOX */
-    .alert-banner { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-weight: 600; display: none; }
-
-    /* SECTIONS TOGGLE */
-    .page-section { display: none; }
-    .page-section.active-page { display: block; }
-
-    /* MODAL STYLES */
-    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-    .modal.show { display: flex; }
-    .modal-content { background: #fff; padding: 25px; border-radius: 16px; width: 100%; max-width: 500px; }
-  </style>
+    <style>
+        .sidebar-item-active {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            font-weight: 600;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-receipt, #printable-receipt * {
+                visibility: visible;
+            }
+            #printable-receipt {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
 
-  <!-- LEFT SIDEBAR MENU -->
-  <div class="sidebar">
-    <div class="brand">🏬 NMA 100%</div>
-    <a class="nav-item active" onclick="showPage('dashboardPage', this)">📊 Dashboard</a>
-    <a class="nav-item" onclick="showPage('productsPage', this)">📦 Products</a>
-    <a class="nav-item" onclick="showPage('purchasingPage', this)">🛍️ Purchasing (Stock In)</a>
-    <a class="nav-item" onclick="showPage('salesPage', this)">🛒 Sales (POS)</a>
-    <a class="nav-item" onclick="showPage('customersPage', this)">👥 Customers Management</a>
-    <a class="nav-item" onclick="showPage('inventoryPage', this)">🏭 Inventory List</a>
-    <a class="nav-item" onclick="showPage('reportsPage', this)">📈 Sales History</a>
-  </div>
+    <!-- LOGIN OVERLAY -->
+    <div id="login-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border border-gray-200">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-3 text-blue-600">
+                    <i class="fa-solid fa-store text-3xl"></i>
+                </div>
+                <h1 class="text-3xl font-extrabold text-gray-800">NMA 100%</h1>
+                <p class="text-sm text-gray-500 mt-1">Ingia Kwenye Mfumo wa Mauzo na Stoo</p>
+            </div>
 
-  <!-- MAIN CONTENT AREA -->
-  <div class="main-content">
-
-    <!-- ALERT BANNER -->
-    <div id="globalAlert" class="alert-banner">
-      ⚠️ TAHADHARI: Kunazo bidhaa zilizofika au kupita kiwango cha chini cha stock! Angalia sehemu ya Inventory.
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Chagua Mfanyakazi</label>
+                    <select id="login-role" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="admin">Msimamizi (Admin)</option>
+                        <option value="cashier">Mhudumu (Cashier)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Neno la Siri (PIN / Password)</label>
+                    <input type="password" id="login-password" required placeholder="Weka Neno la Siri" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <p class="text-xs text-gray-400 mt-1">Default Password: <b>1234</b></p>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition duration-200 shadow-md">
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i> Ingia
+                </button>
+            </form>
+        </div>
     </div>
 
-    <!-- 1. DASHBOARD PAGE -->
-    <div id="dashboardPage" class="page-section active-page">
-      <div class="top-bar">
-        <div>
-          <p class="subtitle">System Management</p>
-          <h1>Dashboard</h1>
+    <!-- MAIN APP WRAPPER -->
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col justify-between no-print">
+            <div>
+                <!-- Brand Header -->
+                <div class="h-16 flex items-center px-6 border-b border-gray-200">
+                    <i class="fa-solid fa-boxes-packing text-blue-600 text-2xl mr-3"></i>
+                    <span class="text-xl font-bold text-gray-800 tracking-wide">NMA 100%</span>
+                </div>
+
+                <!-- User Info Badge -->
+                <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold">Mtumiaji</p>
+                        <p id="current-user-display" class="text-sm font-bold text-gray-800">Admin</p>
+                    </div>
+                    <span id="role-badge" class="px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">ADMIN</span>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="p-4 space-y-1">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                        <i class="fa-solid fa-chart-pie w-6 text-gray-500"></i>
+                        <span>Dashboard</span>
+                    </button>
+
+                    <button onclick="switchTab('pos')" id="nav-pos" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                        <i class="fa-solid fa-cart-shopping w-6 text-gray-500"></i>
+                        <span>Sales (POS)</span>
+                    </button>
+
+                    <button onclick="switchTab('products')" id="nav-products" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                        <i class="fa-solid fa-box w-6 text-gray-500"></i>
+                        <span>Products & Stock</span>
+                    </button>
+
+                    <button onclick="switchTab('customers')" id="nav-customers" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                        <i class="fa-solid fa-users w-6 text-gray-500"></i>
+                        <span>Wateja (Customers)</span>
+                    </button>
+
+                    <button onclick="switchTab('suppliers')" id="nav-suppliers" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                        <i class="fa-solid fa-truck-field w-6 text-gray-500"></i>
+                        <span>Wasambazaji (Suppliers)</span>
+                    </button>
+
+                    <button onclick="switchTab('reports')" id="nav-reports" class="admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                        <i class="fa-solid fa-file-invoice-dollar w-6 text-gray-500"></i>
+                        <span>Ripoti za Mauzo</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Logout Button -->
+            <div class="p-4 border-t border-gray-200">
+                <button onclick="handleLogout()" class="w-full flex items-center justify-center px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg text-sm font-semibold transition">
+                    <i class="fa-solid fa-right-from-bracket mr-2"></i> Ondoka (Logout)
+                </button>
+            </div>
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6 no-print">
+
+            <!-- DASHBOARD SECTION -->
+            <section id="section-dashboard" class="tab-content space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Muhtasari wa Biashara</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                        <p class="text-sm font-medium text-gray-500">Mauzo ya Leo</p>
+                        <h3 id="dash-today-sales" class="text-2xl font-extrabold text-gray-800 mt-2">TSH 0</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                        <p class="text-sm font-medium text-gray-500">Jumla ya Bidhaa</p>
+                        <h3 id="dash-total-products" class="text-2xl font-extrabold text-blue-600 mt-2">0</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                        <p class="text-sm font-medium text-gray-500">Jumla ya Wateja</p>
+                        <h3 id="dash-total-customers" class="text-2xl font-extrabold text-emerald-600 mt-2">0</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                        <p class="text-sm font-medium text-gray-500">Madeni ya Wateja</p>
+                        <h3 id="dash-total-debt" class="text-2xl font-extrabold text-red-600 mt-2">TSH 0</h3>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SALES (POS) SECTION -->
+            <section id="section-pos" class="tab-content hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Sales (POS) & Barcode Scanner</h2>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left: Products & Scanner -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <!-- Barcode Control Box -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
+                            <div class="flex gap-2">
+                                <div class="relative flex-1">
+                                    <i class="fa-solid fa-barcode absolute left-3 top-3 text-gray-400"></i>
+                                    <input type="text" id="hardware-barcode" placeholder="Scan Barcode hapa au tumia scanner..." onchange="handleHardwareScan(this.value)" class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                                <button onclick="toggleCameraScanner()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                                    <i class="fa-solid fa-camera"></i> <span>Kamera</span>
+                                </button>
+                            </div>
+                            <div id="reader-container" class="hidden mt-2 border rounded-lg overflow-hidden">
+                                <div id="reader" class="w-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- Product Search Grid -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <input type="text" id="pos-search" onkeyup="filterPosProducts()" placeholder="Tafuta bidhaa kwa jina..." class="w-full px-4 py-2 border rounded-lg mb-4">
+                            <div id="pos-products-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
+                                <!-- Products loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Cart / Order Summary -->
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between h-full">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 border-b pb-3 mb-3">Oda ya Sasa</h3>
+                            
+                            <!-- Customer Selector -->
+                            <div class="mb-4">
+                                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Mteja</label>
+                                <select id="pos-customer" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                                    <option value="Cash Customer">Mteja wa Kawaida (Cash)</option>
+                                </select>
+                            </div>
+
+                            <!-- Cart Items -->
+                            <div id="cart-items" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                                <p class="text-sm text-gray-400 text-center py-6">Hakuna bidhaa kwenye kikapu.</p>
+                            </div>
+                        </div>
+
+                        <div class="border-t pt-4 mt-6 space-y-3">
+                            <div class="flex justify-between font-bold text-xl text-gray-800">
+                                <span>Jumla:</span>
+                                <span id="cart-total">TSH 0</span>
+                            </div>
+
+                            <button onclick="completeSale()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition">
+                                <i class="fa-solid fa-check-circle mr-2"></i> Kamilisha Mauzo & Risiti
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PRODUCTS SECTION -->
+            <section id="section-products" class="tab-content hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Usimamizi wa Bidhaa</h2>
+                    <button onclick="openProductModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700">
+                        <i class="fa-solid fa-plus mr-1"></i> Ongeza Bidhaa
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
+                            <tr>
+                                <th class="p-4">Barcode</th>
+                                <th class="p-4">Jina la Bidhaa</th>
+                                <th class="p-4">Bei ya Kununua</th>
+                                <th class="p-4">Bei ya Kuuzia</th>
+                                <th class="p-4">Stoo</th>
+                                <th class="p-4 text-center">Kitendo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-table-body" class="divide-y text-sm text-gray-700">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- CUSTOMERS SECTION -->
+            <section id="section-customers" class="tab-content hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Usimamizi wa Wateja</h2>
+                    <button onclick="openCustomerModal()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-emerald-700">
+                        <i class="fa-solid fa-user-plus mr-1"></i> Ongeza Mteja
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
+                            <tr>
+                                <th class="p-4">Jina</th>
+                                <th class="p-4">Simu</th>
+                                <th class="p-4">Anwani</th>
+                                <th class="p-4">Deni (TSH)</th>
+                                <th class="p-4 text-center">Kitendo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customers-table-body" class="divide-y text-sm text-gray-700">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SUPPLIERS SECTION -->
+            <section id="section-suppliers" class="tab-content hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Wasambazaji (Suppliers)</h2>
+                    <button onclick="openSupplierModal()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-purple-700">
+                        <i class="fa-solid fa-truck-arrow-right mr-1"></i> Ongeza Msambazaji
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
+                            <tr>
+                                <th class="p-4">Kampuni / Jina</th>
+                                <th class="p-4">Namba ya Simu</th>
+                                <th class="p-4">Aina ya Bidhaa</th>
+                                <th class="p-4 text-center">Kitendo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppliers-table-body" class="divide-y text-sm text-gray-700">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- REPORTS SECTION -->
+            <section id="section-reports" class="tab-content hidden space-y-6">
+                <h2 class="text-2xl font-bold text-gray-800">Ripoti za Mauzo & Faida</h2>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <div id="sales-history" class="space-y-3">
+                        <!-- Sales history loaded dynamically -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- PRINTABLE RECEIPT (Hidden on screen, visible on print) -->
+    <div id="printable-receipt" class="p-6 max-w-sm mx-auto font-mono text-sm">
+        <div class="text-center border-b pb-3 mb-3">
+            <h2 class="text-xl font-bold uppercase">NMA 100%</h2>
+            <p class="text-xs">Simu: +255 123 456 789</p>
+            <p class="text-xs" id="receipt-date"></p>
+            <p class="text-xs font-bold mt-1" id="receipt-customer"></p>
         </div>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-title">Jumla ya Mauzo</div>
-          <div class="stat-value" id="dashTotalSales">TSh 0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-title">Idadi ya Vitu Vilivyouzwa</div>
-          <div class="stat-value" id="dashUnitsSold">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-title">Low Stock Alert Items</div>
-          <div class="stat-value" id="dashLowStock" style="color: var(--danger-red);">0</div>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Hali ya Hivi Karibuni ya Inventory</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Jina la Bidhaa</th>
-              <th>SKU / Code</th>
-              <th>Stock Iliyopo</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="dashTableBody">
-            <tr><td colspan="4" style="text-align:center; color: var(--text-muted);">Inapakia data...</td></tr>
-          </tbody>
+        <table class="w-full text-left mb-3">
+            <thead>
+                <tr class="border-b text-xs">
+                    <th>Bidhaa</th>
+                    <th>Idadi</th>
+                    <th>Bei</th>
+                </tr>
+            </thead>
+            <tbody id="receipt-items-body"></tbody>
         </table>
-      </div>
+        <div class="border-t pt-2 text-right font-bold text-base">
+            <span>Jumla: </span><span id="receipt-total"></span>
+        </div>
+        <p class="text-center text-xs mt-6">*** Asante kwa Kufanya Kazi Nasi! ***</p>
     </div>
 
-    <!-- 2. PRODUCTS PAGE (REGISTER & EDIT ITEM) -->
-    <div id="productsPage" class="page-section">
-      <div class="top-bar">
-        <div>
-          <p class="subtitle">Product Management</p>
-          <h1 id="formTitle">Sajili Bidhaa Mpya</h1>
-        </div>
-      </div>
-      <div class="card" style="max-width: 600px;">
-        <form id="productForm">
-          <input type="hidden" id="editDocId" value="">
-          <div class="form-group">
-            <label>Jina la Bidhaa:</label>
-            <input type="text" id="pName" placeholder="Mfano: Penzili Dazani" required>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Part Number / SKU / Barcode:</label>
-              <input type="text" id="pPartNo" placeholder="PCL-100" required>
+    <!-- MODAL FOR ADDING PRODUCT -->
+    <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+            <h3 class="text-lg font-bold text-gray-800">Ongeza Bidhaa Mpya</h3>
+            <input type="text" id="prod-barcode" placeholder="Barcode Code" class="w-full p-2 border rounded-lg">
+            <input type="text" id="prod-name" placeholder="Jina la Bidhaa" class="w-full p-2 border rounded-lg">
+            <input type="number" id="prod-cost" placeholder="Bei ya Kununulia" class="w-full p-2 border rounded-lg">
+            <input type="number" id="prod-price" placeholder="Bei ya Kuuzia" class="w-full p-2 border rounded-lg">
+            <input type="number" id="prod-stock" placeholder="Idadi ya Stock" class="w-full p-2 border rounded-lg">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeProductModal()" class="px-4 py-2 border rounded-lg">Ghairi</button>
+                <button onclick="saveProduct()" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Hifadhi</button>
             </div>
-            <div class="form-group">
-              <label>Model / Category:</label>
-              <input type="text" id="pCarModel" placeholder="Stationery / Vifaa">
+        </div>
+    </div>
+
+    <!-- MODAL FOR ADDING CUSTOMER -->
+    <div id="customer-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+            <h3 class="text-lg font-bold text-gray-800">Ongeza Mteja Mpya</h3>
+            <input type="text" id="cust-name" placeholder="Jina la Mteja" class="w-full p-2 border rounded-lg">
+            <input type="text" id="cust-phone" placeholder="Namba ya Simu" class="w-full p-2 border rounded-lg">
+            <input type="text" id="cust-address" placeholder="Anwani / Eneo" class="w-full p-2 border rounded-lg">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeCustomerModal()" class="px-4 py-2 border rounded-lg">Ghairi</button>
+                <button onclick="saveCustomer()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg">Hifadhi</button>
             </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Bei ya Kununulia (TSh):</label>
-              <input type="number" id="pBuyPrice" placeholder="3000" required>
+        </div>
+    </div>
+
+    <!-- MODAL FOR ADDING SUPPLIER -->
+    <div id="supplier-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+            <h3 class="text-lg font-bold text-gray-800">Ongeza Msambazaji Mpya</h3>
+            <input type="text" id="supp-name" placeholder="Jina la Kampuni / Msambazaji" class="w-full p-2 border rounded-lg">
+            <input type="text" id="supp-phone" placeholder="Namba ya Simu" class="w-full p-2 border rounded-lg">
+            <input type="text" id="supp-items" placeholder="Aina ya Bidhaa Anazozuia" class="w-full p-2 border rounded-lg">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeSupplierModal()" class="px-4 py-2 border rounded-lg">Ghairi</button>
+                <button onclick="saveSupplier()" class="px-4 py-2 bg-purple-600 text-white rounded-lg">Hifadhi</button>
             </div>
-            <div class="form-group">
-              <label>Bei ya Kuuzia (TSh):</label>
-              <input type="number" id="pSellPrice" placeholder="5000" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Stock ya Mwanzo (Qty):</label>
-              <input type="number" id="pInitialStock" value="10" required>
-            </div>
-            <div class="form-group">
-              <label>Reorder Alert Level:</label>
-              <input type="number" id="pMinAlert" value="3" required>
-            </div>
-          </div>
-          <button type="button" id="btnSave" class="btn-brown" onclick="saveProduct()">Hifadhi Bidhaa</button>
-        </form>
-      </div>
+        </div>
     </div>
 
-    <!-- 3. PURCHASING PAGE (STOCK IN) -->
-    <div id="purchasingPage" class="page-section">
-      <div class="top-bar">
-        <div>
-          <p class="subtitle">Stock Inflow</p>
-          <h1>Pokea Mzigo Mpya (Purchasing)</h1>
-        </div>
-      </div>
-      <div class="card" style="max-width: 500px;">
-        <div class="form-group">
-          <label>Chagua Bidhaa:</label>
-          <select id="buyProductSelect">
-            <option value="">Chagua Bidhaa...</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Idadi Iliyopokelewa (Qty):</label>
-          <input type="number" id="buyQty" value="5" min="1">
-        </div>
-        <button type="button" class="btn-brown" onclick="processStockIn()">+ Ongeza Kwenye Stock</button>
-      </div>
-    </div>
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- LOCAL STORAGE STATE MANAGEMENT ---
+        let currentUserRole = null;
+        let products = JSON.parse(localStorage.getItem('nma_products')) || [];
+        let customers = JSON.parse(localStorage.getItem('nma_customers')) || [];
+        let suppliers = JSON.parse(localStorage.getItem('nma_suppliers')) || [];
+        let salesHistory = JSON.parse(localStorage.getItem('nma_sales')) || [];
+        let cart = [];
+        let html5QrcodeScanner = null;
 
-    <!-- 4. SALES PAGE (POS WITH BARCODE SCANNING) -->
-    <div id="salesPage" class="page-section">
-      <div class="top-bar">
-        <div>
-          <p class="subtitle">Point of Sale</p>
-          <h1>Fanya Mauzo (POS)</h1>
-        </div>
-      </div>
-      <div class="card" style="max-width: 500px;">
+        // --- AUTHENTICATION & PERMISSIONS ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const role = document.getElementById('login-role').value;
+            const pass = document.getElementById('login-password').value;
 
-        <!-- BARCODE INPUT (HARDWARE SCANNER) -->
-        <div class="form-group">
-          <label>📷 Scan Barcode (Hardware Scanner):</label>
-          <input type="text" id="barcodeInput" placeholder="Elekeza scanner hapa..." autofocus>
-        </div>
+            if (pass === '1234') {
+                currentUserRole = role;
+                document.getElementById('login-overlay').classList.add('hidden');
+                document.getElementById('current-user-display').innerText = role.toUpperCase();
+                document.getElementById('role-badge').innerText = role.toUpperCase();
 
-        <!-- CAMERA SCANNING BUTTON & CONTAINER -->
-        <button type="button" class="btn-secondary" style="width: 100%; margin-bottom: 15px;" onclick="startCameraScanner()">
-          📷 Scan Kwa Kamera ya Simu
-        </button>
-
-        <div id="reader-container" style="display:none; margin-bottom: 15px; border: 1px solid var(--border-color); padding: 10px; border-radius: 12px; text-align: center;">
-          <div id="reader"></div>
-          <button type="button" class="btn-delete" style="margin-top: 8px;" onclick="stopCameraScanner()">Funga Kamera</button>
-        </div>
-
-        <div class="form-group">
-          <label>Chagua Bidhaa Inayouzwa Manually:</label>
-          <select id="saleProductSelect">
-            <option value="">Chagua Bidhaa...</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Idadi Inayouzwa:</label>
-            <input type="number" id="saleQty" value="1" min="1">
-          </div>
-          <div class="form-group">
-            <label>Chagua Mteja:</label>
-            <select id="saleCustomerSelect">
-              <option value="Cash Customer">Mteja wa Kawaida (Cash)</option>
-            </select>
-          </div>
-        </div>
-        <button type="button" class="btn-brown" onclick="processSale()">Sajili Mauzo</button>
-      </div>
-    </div>
-
-    <!-- 5. CUSTOMERS MANAGEMENT PAGE -->
-    <div id="customersPage" class="page-section">
-      <div class="top-bar">
-        <div>
-          <p class="subtitle">Customer Care</p>
-          <h1>Usimamizi wa Wateja</h1>
-        </div>
-        <button class="btn-brown" style="width: auto;" onclick="openCustomerModal()">+ Ongeza Mteja Mpya</button>
-      </div>
-      <div class="card">
-        <table>
-          <thead>
-            <tr>
-              <th>Jina la Mteja</th>
-              <th>Simu</th>
-              <th>Anwani / Mahali</th>
-              <th>Deni (TSh)</th>
-              <th>Vitendo</th>
-            </tr>
-          </thead>
-          <tbody id="customersTableBody">
-            <tr><td colspan="5" style="text-align:center;">Inapakia wateja...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- 6. INVENTORY LIST PAGE -->
-    <div id="inventoryPage" class="page-section">
-      <div class="top-bar">
-        <div>
-          <p class="subtitle">Orodha ya Bidhaa</p>
-          <h1>Inventory List</h1>
-        </div>
-      </div>
-      <div class="card">
-        <table>
-          <thead>
-            <tr>
-              <th>Jina la Bidhaa</th>
-              <th>SKU / Part No</th>
-              <th>Bei ya Kuuzia</th>
-              <th>Stock Iliyopo</th>
-              <th>Hali</th>
-              <th>Vitendo (Actions)</th>
-            </tr>
-          </thead>
-          <tbody id="inventoryTableBody">
-            <tr><td colspan="6" style="text-align:center;">Inapakia...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- 7. SALES HISTORY PAGE -->
-    <div id="reportsPage" class="page-section">
-      <div class="top-bar">
-        <div>
-          <p class="subtitle">Kumbukumbu za Mauzo</p>
-          <h1>Sales History</h1>
-        </div>
-      </div>
-      <div class="card">
-        <table>
-          <thead>
-            <tr>
-              <th>Tarehe</th>
-              <th>Bidhaa</th>
-              <th>Idadi</th>
-              <th>Mteja</th>
-              <th>Jumla (TSh)</th>
-            </tr>
-          </thead>
-          <tbody id="salesTableBody">
-            <tr><td colspan="5" style="text-align:center;">Inapakia...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- MODAL YA USIMAMIZI WA WATEJA -->
-  <div id="customerModal" class="modal">
-    <div class="modal-content">
-      <h3 id="custModalTitle" style="margin-bottom: 15px;">Ongeza Mteja Mpya</h3>
-      <input type="hidden" id="editCustId" value="">
-      <div class="form-group">
-        <label>Jina Kamili:</label>
-        <input type="text" id="cName" placeholder="Mfano: Juma Shabani" required>
-      </div>
-      <div class="form-group">
-        <label>Namba ya Simu:</label>
-        <input type="text" id="cPhone" placeholder="0712345678" required>
-      </div>
-      <div class="form-group">
-        <label>Anwani / Mahali:</label>
-        <input type="text" id="cAddress" placeholder="Kariakoo, Dar es Salaam">
-      </div>
-      <div class="form-group">
-        <label>Deni la Awali (TSh):</label>
-        <input type="number" id="cDebt" value="0">
-      </div>
-      <div style="display: flex; gap: 10px; margin-top: 15px;">
-        <button type="button" class="btn-brown" onclick="saveCustomer()">Hifadhi Mteja</button>
-        <button type="button" class="btn-secondary" onclick="closeCustomerModal()">Ghairi</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- FIREBASE SDK & APP SCRIPT -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDummyKeyForYourProject",
-      authDomain: "nma-100.firebaseapp.com",
-      projectId: "nma-100",
-      storageBucket: "nma-100.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abcdef"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    let productsData = [];
-    let customersData = [];
-    let html5QrcodeScanner = null;
-
-    // Toggle Pages
-    window.showPage = function(pageId, element) {
-      document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active-page'));
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active-page');
-      if(element) element.classList.add('active');
-    };
-
-    // Real-time listener for Products
-    onSnapshot(collection(db, "products"), (snapshot) => {
-      productsData = [];
-      snapshot.forEach((doc) => {
-        productsData.push({ id: doc.id, ...doc.data() });
-      });
-      renderDashboard();
-      renderInventory();
-      populateDropdowns();
-    });
-
-    // Real-time listener for Customers
-    onSnapshot(collection(db, "customers"), (snapshot) => {
-      customersData = [];
-      snapshot.forEach((doc) => {
-        customersData.push({ id: doc.id, ...doc.data() });
-      });
-      renderCustomers();
-      populateCustomerDropdown();
-    });
-
-    // Render Dashboard
-    function renderDashboard() {
-      const dashTable = document.getElementById('dashTableBody');
-      dashTable.innerHTML = '';
-      let lowStock = 0;
-
-      productsData.forEach(p => {
-        const isLow = Number(p.stock) <= Number(p.minAlert);
-        if(isLow) lowStock++;
-
-        dashTable.innerHTML += `
-          <tr>
-            <td><strong>${p.name}</strong></td>
-            <td>${p.partNo}</td>
-            <td>${p.stock}</td>
-            <td><span class="${isLow ? 'badge-low' : 'badge-ok'}">${isLow ? 'Low Stock' : 'OK'}</span></td>
-          </tr>
-        `;
-      });
-
-      document.getElementById('dashLowStock').innerText = lowStock;
-      document.getElementById('globalAlert').style.display = lowStock > 0 ? 'block' : 'none';
-    }
-
-    // Render Inventory
-    function renderInventory() {
-      const invTable = document.getElementById('inventoryTableBody');
-      invTable.innerHTML = '';
-
-      productsData.forEach(p => {
-        const isLow = Number(p.stock) <= Number(p.minAlert);
-        invTable.innerHTML += `
-          <tr>
-            <td><strong>${p.name}</strong></td>
-            <td>${p.partNo}</td>
-            <td>TSh ${Number(p.sellPrice).toLocaleString()}</td>
-            <td>${p.stock}</td>
-            <td><span class="${isLow ? 'badge-low' : 'badge-ok'}">${isLow ? 'Punguza/Weka Mzigo' : 'Ipo ya Kutosha'}</span></td>
-            <td>
-              <button class="btn-edit" onclick="prepareEdit('${p.id}')">Edit</button>
-              <button class="btn-delete" onclick="deleteProduct('${p.id}')">Delete</button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    // Render Customers Table
-    function renderCustomers() {
-      const custTable = document.getElementById('customersTableBody');
-      custTable.innerHTML = '';
-
-      if (customersData.length === 0) {
-        custTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">Hakuna mteja aliyesajiliwa bado.</td></tr>';
-        return;
-      }
-
-      customersData.forEach(c => {
-        custTable.innerHTML += `
-          <tr>
-            <td><strong>${c.name}</strong></td>
-            <td>${c.phone}</td>
-            <td>${c.address || '-'}</td>
-            <td style="color: ${c.debt > 0 ? 'var(--danger-red)' : 'var(--success-green)'}; font-weight: bold;">
-              TSh ${Number(c.debt || 0).toLocaleString()}
-            </td>
-            <td>
-              <button class="btn-edit" onclick="prepareEditCustomer('${c.id}')">Edit</button>
-              <button class="btn-delete" onclick="deleteCustomer('${c.id}')">Delete</button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    // Dropdowns
-    function populateDropdowns() {
-      const buySelect = document.getElementById('buyProductSelect');
-      const saleSelect = document.getElementById('saleProductSelect');
-      
-      let options = '<option value="">Chagua Bidhaa...</option>';
-      productsData.forEach(p => {
-        options += `<option value="${p.id}">${p.name} (${p.stock} zilizopo)</option>`;
-      });
-
-      buySelect.innerHTML = options;
-      saleSelect.innerHTML = options;
-    }
-
-    function populateCustomerDropdown() {
-      const saleCustSelect = document.getElementById('saleCustomerSelect');
-      let options = '<option value="Cash Customer">Mteja wa Kawaida (Cash)</option>';
-      customersData.forEach(c => {
-        options += `<option value="${c.name}">${c.name} (${c.phone})</option>`;
-      });
-      saleCustSelect.innerHTML = options;
-    }
-
-    // Save or Edit Product
-    window.saveProduct = async function() {
-      const docId = document.getElementById('editDocId').value;
-      const name = document.getElementById('pName').value;
-      const partNo = document.getElementById('pPartNo').value;
-      const carModel = document.getElementById('pCarModel').value;
-      const buyPrice = document.getElementById('pBuyPrice').value;
-      const sellPrice = document.getElementById('pSellPrice').value;
-      const stock = document.getElementById('pInitialStock').value;
-      const minAlert = document.getElementById('pMinAlert').value;
-
-      if (!name || !partNo || !sellPrice) {
-        alert("Tafadhali jaza taarifa zote muhimu!");
-        return;
-      }
-
-      try {
-        if (docId) {
-          await updateDoc(doc(db, "products", docId), {
-            name, partNo, carModel,
-            buyPrice: Number(buyPrice),
-            sellPrice: Number(sellPrice),
-            stock: Number(stock),
-            minAlert: Number(minAlert)
-          });
-          alert("Bidhaa imerekebishwa kikamilifu!");
-        } else {
-          await addDoc(collection(db, "products"), {
-            name, partNo, carModel,
-            buyPrice: Number(buyPrice),
-            sellPrice: Number(sellPrice),
-            stock: Number(stock),
-            minAlert: Number(minAlert)
-          });
-          alert("Bidhaa mpya imehifadhiwa!");
+                // Apply Permissions
+                if (role === 'cashier') {
+                    document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
+                    switchTab('pos');
+                } else {
+                    document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+                    switchTab('dashboard');
+                }
+                renderAll();
+            } else {
+                alert('Neno la siri sio sahihi! Tumia 1234');
+            }
         }
 
-        document.getElementById('productForm').reset();
-        document.getElementById('editDocId').value = '';
-        document.getElementById('formTitle').innerText = 'Sajili Bidhaa Mpya';
-        document.getElementById('btnSave').innerText = 'Hifadhi Bidhaa';
-
-      } catch (e) {
-        alert("Kuna shida imetokea: " + e.message);
-      }
-    };
-
-    window.prepareEdit = function(id) {
-      const item = productsData.find(p => p.id === id);
-      if (!item) return;
-
-      document.getElementById('editDocId').value = item.id;
-      document.getElementById('pName').value = item.name;
-      document.getElementById('pPartNo').value = item.partNo;
-      document.getElementById('pCarModel').value = item.carModel || '';
-      document.getElementById('pBuyPrice').value = item.buyPrice;
-      document.getElementById('pSellPrice').value = item.sellPrice;
-      document.getElementById('pInitialStock').value = item.stock;
-      document.getElementById('pMinAlert').value = item.minAlert;
-
-      document.getElementById('formTitle').innerText = 'Rekebisha Bidhaa';
-      document.getElementById('btnSave').innerText = 'Hifadhi Mabadiliko';
-
-      window.showPage('productsPage');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    window.deleteProduct = async function(id) {
-      if (confirm("Je, una uhakika unataka kufuta bidhaa hii kikamilifu?")) {
-        try {
-          await deleteDoc(doc(db, "products", id));
-          alert("Bidhaa imefutwa!");
-        } catch (e) {
-          alert("Imeshindikana kufuta: " + e.message);
-        }
-      }
-    };
-
-    // CUSTOMER FUNCTIONS
-    window.openCustomerModal = function() {
-      document.getElementById('editCustId').value = '';
-      document.getElementById('cName').value = '';
-      document.getElementById('cPhone').value = '';
-      document.getElementById('cAddress').value = '';
-      document.getElementById('cDebt').value = 0;
-      document.getElementById('custModalTitle').innerText = 'Ongeza Mteja Mpya';
-      document.getElementById('customerModal').classList.add('show');
-    };
-
-    window.closeCustomerModal = function() {
-      document.getElementById('customerModal').classList.remove('show');
-    };
-
-    window.saveCustomer = async function() {
-      const id = document.getElementById('editCustId').value;
-      const name = document.getElementById('cName').value.trim();
-      const phone = document.getElementById('cPhone').value.trim();
-      const address = document.getElementById('cAddress').value.trim();
-      const debt = Number(document.getElementById('cDebt').value) || 0;
-
-      if (!name || !phone) {
-        alert("Tafadhali jaza Jina na Namba ya Simu ya mteja!");
-        return;
-      }
-
-      try {
-        if (id) {
-          await updateDoc(doc(db, "customers", id), { name, phone, address, debt });
-          alert("Taarifa za mteja zimebadilishwa!");
-        } else {
-          await addDoc(collection(db, "customers"), { name, phone, address, debt });
-          alert("Mteja mpya amesajiliwa kikamilifu!");
-        }
-        closeCustomerModal();
-      } catch (e) {
-        alert("Imeshindikana kuhifadhi mteja: " + e.message);
-      }
-    };
-
-    window.prepareEditCustomer = function(id) {
-      const c = customersData.find(item => item.id === id);
-      if (!c) return;
-
-      document.getElementById('editCustId').value = c.id;
-      document.getElementById('cName').value = c.name;
-      document.getElementById('cPhone').value = c.phone;
-      document.getElementById('cAddress').value = c.address || '';
-      document.getElementById('cDebt').value = c.debt || 0;
-      document.getElementById('custModalTitle').innerText = 'Badili Taarifa za Mteja';
-
-      document.getElementById('customerModal').classList.add('show');
-    };
-
-    window.deleteCustomer = async function(id) {
-      if (confirm("Je, una uhakika unataka kumfuta mteja huyu?")) {
-        try {
-          await deleteDoc(doc(db, "customers", id));
-          alert("Mteja amefutwa!");
-        } catch (e) {
-          alert("Imeshindikana kufuta: " + e.message);
-        }
-      }
-    };
-
-    // BARCODE SCANNING LOGIC
-    document.getElementById('barcodeInput').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        let barcodeValue = this.value.trim();
-        if (barcodeValue) {
-          matchAndSelectBarcodeProduct(barcodeValue);
-          this.value = '';
-        }
-      }
-    });
-
-    window.startCameraScanner = function() {
-      document.getElementById('reader-container').style.display = 'block';
-      html5QrcodeScanner = new Html5Qrcode("reader");
-      const config = { fps: 10, qrbox: { width: 250, height: 150 } };
-
-      html5QrcodeScanner.start(
-        { facingMode: "environment" },
-        config,
-        (decodedText) => {
-          matchAndSelectBarcodeProduct(decodedText);
-          stopCameraScanner();
-        },
-        () => {}
-      ).catch(err => {
-        alert("Kamera Imeshindwa Funguka: " + err);
-      });
-    };
-
-    window.stopCameraScanner = function() {
-      if (html5QrcodeScanner) {
-        html5QrcodeScanner.stop().then(() => {
-          document.getElementById('reader-container').style.display = 'none';
-        }).catch(err => console.error(err));
-      } else {
-        document.getElementById('reader-container').style.display = 'none';
-      }
-    };
-
-    function matchAndSelectBarcodeProduct(barcode) {
-      const matched = productsData.find(p => p.partNo.toLowerCase() === barcode.toLowerCase());
-      if (matched) {
-        document.getElementById('saleProductSelect').value = matched.id;
-        alert(`Bidhaa Imepatikana: ${matched.name}`);
-      } else {
-        alert(`Hakuna bidhaa yenye Barcode/SKU: ${barcode}`);
-      }
-    }
-
-    // Stock & Sales operations
-    window.processStockIn = async function() {
-      const pId = document.getElementById('buyProductSelect').value;
-      const qty = Number(document.getElementById('buyQty').value);
-
-      if(!pId || qty <= 0) { alert("Chagua bidhaa na uweke idadi sahihi."); return; }
-
-      const item = productsData.find(p => p.id === pId);
-      if(item) {
-        await updateDoc(doc(db, "products", pId), { stock: Number(item.stock) + qty });
-        alert("Stock imeongezwa kikamilifu!");
-      }
-    };
-
-    window.processSale = async function() {
-      const pId = document.getElementById('saleProductSelect').value;
-      const qty = Number(document.getElementById('saleQty').value);
-
-      if(!pId || qty <= 0) { alert("Chagua bidhaa na uweke idadi sahihi."); return; }
-
-      const item = productsData.find(p => p.id === pId);
-      if(item) {
-        if(item.stock < qty) {
-          alert("Stock haitoshi kufanya mauzo haya!");
-          return;
+        function handleLogout() {
+            currentUserRole = null;
+            document.getElementById('login-overlay').classList.remove('hidden');
         }
 
-        await updateDoc(doc(db, "products", pId), { stock: Number(item.stock) - qty });
-        alert("Mauzo yamekamilika!");
-      }
-    };
-  </script>
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`section-${tabId}`).classList.remove('hidden');
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderAll() {
+            renderProducts();
+            renderCustomers();
+            renderSuppliers();
+            renderPosGrid();
+            renderDashboard();
+            renderSalesHistory();
+            updateCustomerDropdown();
+        }
+
+        function renderProducts() {
+            const tbody = document.getElementById('products-table-body');
+            tbody.innerHTML = products.map((p, index) => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-mono font-semibold text-blue-600">${p.barcode || 'N/A'}</td>
+                    <td class="p-4 font-bold">${p.name}</td>
+                    <td class="p-4">TSH ${p.cost}</td>
+                    <td class="p-4 font-bold text-emerald-600">TSH ${p.price}</td>
+                    <td class="p-4"><span class="px-2 py-1 bg-gray-100 rounded">${p.stock}</span></td>
+                    <td class="p-4 text-center">
+                        ${currentUserRole === 'admin' ? `<button onclick="deleteProduct(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderCustomers() {
+            const tbody = document.getElementById('customers-table-body');
+            tbody.innerHTML = customers.map((c, index) => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-bold">${c.name}</td>
+                    <td class="p-4">${c.phone}</td>
+                    <td class="p-4">${c.address}</td>
+                    <td class="p-4 font-bold text-red-600">TSH ${c.debt || 0}</td>
+                    <td class="p-4 text-center">
+                        <button onclick="deleteCustomer(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderSuppliers() {
+            const tbody = document.getElementById('suppliers-table-body');
+            tbody.innerHTML = suppliers.map((s, index) => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-bold">${s.name}</td>
+                    <td class="p-4">${s.phone}</td>
+                    <td class="p-4"><span class="px-2 py-1 bg-purple-50 text-purple-700 rounded">${s.items}</span></td>
+                    <td class="p-4 text-center">
+                        <button onclick="deleteSupplier(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPosGrid() {
+            const grid = document.getElementById('pos-products-grid');
+            grid.innerHTML = products.map(p => `
+                <div onclick="addToCart('${p.barcode}')" class="p-3 border rounded-xl hover:shadow-md cursor-pointer transition bg-gray-50 flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs text-blue-600 font-mono">${p.barcode}</p>
+                        <h4 class="font-bold text-sm text-gray-800">${p.name}</h4>
+                    </div>
+                    <div class="mt-2 flex justify-between items-center">
+                        <span class="text-xs font-bold text-emerald-600">TSH ${p.price}</span>
+                        <span class="text-xs text-gray-400">Stock: ${p.stock}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateCustomerDropdown() {
+            const select = document.getElementById('pos-customer');
+            select.innerHTML = `<option value="Cash Customer">Mteja wa Kawaida (Cash)</option>` + 
+                customers.map(c => `<option value="${c.name}">${c.name} (${c.phone})</option>`).join('');
+        }
+
+        // --- CART & POS LOGIC ---
+        function addToCart(barcode) {
+            const product = products.find(p => p.barcode === barcode);
+            if (!product || product.stock <= 0) {
+                alert('Bidhaa haipo au imeisha kwenye stock!');
+                return;
+            }
+
+            const existing = cart.find(item => item.barcode === barcode);
+            if (existing) {
+                if (existing.qty < product.stock) {
+                    existing.qty++;
+                } else {
+                    alert('Imefikia ukomo wa stock iliyopo!');
+                }
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-sm text-gray-400 text-center py-6">Hakuna bidhaa kwenye kikapu.</p>`;
+                document.getElementById('cart-total').innerText = 'TSH 0';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map((item, index) => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                return `
+                    <div class="flex items-center justify-between border-b pb-2">
+                        <div>
+                            <p class="font-bold text-sm text-gray-800">${item.name}</p>
+                            <p class="text-xs text-gray-500">TSH ${item.price} x ${item.qty}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-sm">TSH ${subtotal}</span>
+                            <button onclick="removeFromCart(${index})" class="text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('cart-total').innerText = `TSH ${total}`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCart();
+        }
+
+        function completeSale() {
+            if (cart.length === 0) return alert('Weka bidhaa kwenye kikapu kwanza!');
+
+            const customerName = document.getElementById('pos-customer').value;
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            // Deduct Stock
+            cart.forEach(cartItem => {
+                const p = products.find(prod => prod.barcode === cartItem.barcode);
+                if (p) p.stock -= cartItem.qty;
+            });
+
+            // Save Sale History
+            const saleRecord = {
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                customer: customerName,
+                items: [...cart],
+                total: total
+            };
+            salesHistory.push(saleRecord);
+
+            // Save LocalStorage
+            localStorage.setItem('nma_products', JSON.stringify(products));
+            localStorage.setItem('nma_sales', JSON.stringify(salesHistory));
+
+            // Print Receipt
+            triggerReceiptPrint(saleRecord);
+
+            // Reset
+            cart = [];
+            renderCart();
+            renderAll();
+        }
+
+        function triggerReceiptPrint(sale) {
+            document.getElementById('receipt-date').innerText = sale.date;
+            document.getElementById('receipt-customer').innerText = `Mteja: ${sale.customer}`;
+            
+            const tbody = document.getElementById('receipt-items-body');
+            tbody.innerHTML = sale.items.map(i => `
+                <tr>
+                    <td>${i.name}</td>
+                    <td>${i.qty}</td>
+                    <td>${i.price * i.qty}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('receipt-total').innerText = `TSH ${sale.total}`;
+            window.print();
+        }
+
+        // --- BARCODE SCANNER LOGIC ---
+        function handleHardwareScan(barcode) {
+            if (!barcode) return;
+            addToCart(barcode.trim());
+            document.getElementById('hardware-barcode').value = '';
+        }
+
+        function toggleCameraScanner() {
+            const container = document.getElementById('reader-container');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+                html5QrcodeScanner.render((decodedText) => {
+                    addToCart(decodedText);
+                    html5QrcodeScanner.clear();
+                    container.classList.add('hidden');
+                });
+            } else {
+                if (html5QrcodeScanner) html5QrcodeScanner.clear();
+                container.classList.add('hidden');
+            }
+        }
+
+        // --- DASHBOARD & REPORTS ---
+        function renderDashboard() {
+            document.getElementById('dash-total-products').innerText = products.length;
+            document.getElementById('dash-total-customers').innerText = customers.length;
+            
+            const totalDebt = customers.reduce((sum, c) => sum + Number(c.debt || 0), 0);
+            document.getElementById('dash-total-debt').innerText = `TSH ${totalDebt}`;
+
+            const todayTotal = salesHistory.reduce((sum, s) => sum + s.total, 0);
+            document.getElementById('dash-today-sales').innerText = `TSH ${todayTotal}`;
+        }
+
+        function renderSalesHistory() {
+            const container = document.getElementById('sales-history');
+            if (salesHistory.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-sm">Bado hakuna kumbukumbu za mauzo.</p>`;
+                return;
+            }
+
+            container.innerHTML = salesHistory.map(s => `
+                <div class="p-4 border rounded-xl flex justify-between items-center bg-gray-50">
+                    <div>
+                        <p class="font-bold text-gray-800">${s.customer}</p>
+                        <p class="text-xs text-gray-500">${s.date}</p>
+                    </div>
+                    <span class="font-bold text-emerald-600 text-lg">TSH ${s.total}</span>
+                </div>
+            `).join('');
+        }
+
+        // --- MODAL & DATA SAVE HANDLERS ---
+        function openProductModal() { document.getElementById('product-modal').classList.remove('hidden'); }
+        function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
+        function saveProduct() {
+            const p = {
+                barcode: document.getElementById('prod-barcode').value,
+                name: document.getElementById('prod-name').value,
+                cost: Number(document.getElementById('prod-cost').value),
+                price: Number(document.getElementById('prod-price').value),
+                stock: Number(document.getElementById('prod-stock').value)
+            };
+            products.push(p);
+            localStorage.setItem('nma_products', JSON.stringify(products));
+            closeProductModal();
+            renderAll();
+        }
+
+        function openCustomerModal() { document.getElementById('customer-modal').classList.remove('hidden'); }
+        function closeCustomerModal() { document.getElementById('customer-modal').classList.add('hidden'); }
+        function saveCustomer() {
+            const c = {
+                name: document.getElementById('cust-name').value,
+                phone: document.getElementById('cust-phone').value,
+                address: document.getElementById('cust-address').value,
+                debt: 0
+            };
+            customers.push(c);
+            localStorage.setItem('nma_customers', JSON.stringify(customers));
+            closeCustomerModal();
+            renderAll();
+        }
+
+        function openSupplierModal() { document.getElementById('supplier-modal').classList.remove('hidden'); }
+        function closeSupplierModal() { document.getElementById('supplier-modal').classList.add('hidden'); }
+        function saveSupplier() {
+            const s = {
+                name: document.getElementById('supp-name').value,
+                phone: document.getElementById('supp-phone').value,
+                items: document.getElementById('supp-items').value
+            };
+            suppliers.push(s);
+            localStorage.setItem('nma_suppliers', JSON.stringify(suppliers));
+            closeSupplierModal();
+            renderAll();
+        }
+
+        function deleteProduct(i) { products.splice(i, 1); localStorage.setItem('nma_products', JSON.stringify(products)); renderAll(); }
+        function deleteCustomer(i) { customers.splice(i, 1); localStorage.setItem('nma_customers', JSON.stringify(customers)); renderAll(); }
+        function deleteSupplier(i) { suppliers.splice(i, 1); localStorage.setItem('nma_suppliers', JSON.stringify(suppliers)); renderAll(); }
+
+        // INITIAL LOAD
+        renderAll();
+    </script>
 </body>
-  </html>
+</html>
