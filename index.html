@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NMA-100%</title>
+  <style>
+    :root {
+      --bg-main: #f7f3ec;
+      --bg-card: #ffffff;
+      --accent-brown: #733e0a;
+      --accent-brown-hover: #582f07;
+      --text-dark: #2c241d;
+      --text-muted: #8c827a;
+      --border-color: #eee9e0;
+      --danger-red: #ef4444;
+      --success-green: #16a34a;
+    }
+
+    * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
+    body { background-color: var(--bg-main); color: var(--text-dark); display: flex; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar { width: 250px; background: var(--bg-main); padding: 20px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+    .brand { font-size: 1.3rem; font-weight: 800; color: var(--accent-brown); padding-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-color); margin-bottom: 10px; }
+    .nav-item { padding: 12px 16px; border-radius: 12px; font-weight: 600; color: var(--text-dark); text-decoration: none; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
+    .nav-item:hover, .nav-item.active { background: #efe8dc; color: var(--accent-brown); }
+
+    /* MAIN CONTENT */
+    .main-content { flex: 1; padding: 25px; overflow-y: auto; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .top-bar h1 { font-size: 1.6rem; font-weight: 800; }
+    .subtitle { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+
+    /* CARDS & TABLES */
+    .card { background: var(--bg-card); padding: 22px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); margin-bottom: 20px; border: 1px solid var(--border-color); }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: var(--bg-card); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); }
+    .stat-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+    .stat-value { font-size: 1.6rem; font-weight: 800; margin-top: 8px; }
+
+    /* FORMS & INPUTS */
+    .form-group { margin-bottom: 15px; }
+    label { font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; display: block; color: var(--text-dark); }
+    input, select { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 0.95rem; background: #faf8f5; outline: none; }
+    input:focus, select:focus { border-color: var(--accent-brown); background: #fff; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+    /* BUTTONS */
+    .btn-brown { background: var(--accent-brown); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; width: 100%; }
+    .btn-brown:hover { background: var(--accent-brown-hover); }
+
+    /* TABLES */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th { text-align: left; padding: 12px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+    td { padding: 14px 12px; font-size: 0.9rem; border-bottom: 1px solid #f9f8f6; }
+    .badge-low { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; }
+    .badge-ok { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; }
+
+    /* ALERT BOX */
+    .alert-banner { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-weight: 600; display: none; }
+
+    /* SECTIONS TOGGLE */
+    .page-section { display: none; }
+    .page-section.active-page { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT SIDEBAR MENU -->
+  <div class="sidebar">
+    <div class="brand">🏬 Icon.shop</div>
+    <a class="nav-item active" onclick="showPage('dashboardPage', this)">📊 Dashboard</a>
+    <a class="nav-item" onclick="showPage('productsPage', this)">📦 Products</a>
+    <a class="nav-item" onclick="showPage('purchasingPage', this)">🛍️ Purchasing (Stock In)</a>
+    <a class="nav-item" onclick="showPage('salesPage', this)">🛒 Sales (POS)</a>
+    <a class="nav-item" onclick="showPage('inventoryPage', this)">🏭 Inventory List</a>
+    <a class="nav-item" onclick="showPage('reportsPage', this)">📈 Sales History</a>
+  </div>
+
+  <!-- MAIN CONTENT AREA -->
+  <div class="main-content">
+
+    <!-- ALERT BANNER -->
+    <div id="globalAlert" class="alert-banner">
+      ⚠️ TAHADHARI: Kunazo bidhaa zilizofika au kupita kiwango cha chini cha stock! Angalia sehemu ya Inventory.
+    </div>
+
+    <!-- 1. DASHBOARD PAGE -->
+    <div id="dashboardPage" class="page-section active-page">
+      <div class="top-bar">
+        <div>
+          <p class="subtitle">System Management</p>
+          <h1>Dashboard</h1>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Jumla ya Mauzo</div>
+          <div class="stat-value" id="dashTotalSales">TSh 0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Idadi ya Vitu Vilivyouzwa</div>
+          <div class="stat-value" id="dashUnitsSold">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Low Stock Alert Items</div>
+          <div class="stat-value" id="dashLowStock" style="color: var(--danger-red);">0</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Hali ya Hivi Karibuni ya Inventory</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Jina la Spare Part</th>
+              <th>Part Number</th>
+              <th>Stock Iliyopo</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="dashTableBody">
+            <tr><td colspan="4" style="text-align:center; color: var(--text-muted);">Inapakia data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2. PRODUCTS PAGE (REGISTER NEW ITEM) -->
+    <div id="productsPage" class="page-section">
+      <div class="top-bar">
+        <div>
+          <p class="subtitle">Product Management</p>
+          <h1>Sajili Spare Part Mpya</h1>
+        </div>
+      </div>
+      <div class="card" style="max-width: 600px;">
+        <form id="productForm">
+          <div class="form-group">
+            <label>Jina la Spare Part:</label>
+            <input type="text" id="pName" placeholder="Mfano: Brake Pads Front" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Part Number / SKU:</label>
+              <input type="text" id="pPartNo" placeholder="BP-TY-2005" required>
+            </div>
+            <div class="form-group">
+              <label>Model ya Gari:</label>
+              <input type="text" id="pCarModel" placeholder="Toyota IST / Vitz">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Bei ya Kununulia (TSh):</label>
+              <input type="number" id="pBuyPrice" placeholder="35000" required>
+            </div>
+            <div class="form-group">
+              <label>Bei ya Kuuzia (TSh):</label>
+              <input type="number" id="pSellPrice" placeholder="50000" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Stock ya Mwanzo (Qty):</label>
+              <input type="number" id="pInitialStock" value="10" required>
+            </div>
+            <div class="form-group">
+              <label>Reorder Alert Level:</label>
+              <input type="number" id="pMinAlert" value="3" required>
+            </div>
+          </div>
+          <button type="button" class="btn-brown" onclick="saveProduct()">Hifadhi Bidhaa</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 3. PURCHASING PAGE (STOCK IN) -->
+    <div id="purchasingPage" class="page-section">
+      <div class="top-bar">
+        <div>
+          <p class="subtitle">Stock Inflow</p>
+          <h1>Pokea Mzigo Mpya (Purchasing)</h1>
+        </div>
+      </div>
+      <div class="card" style="max-width: 500px;">
+        <div class="form-group">
+          <label>Chagua Spare Part:</label>
+          <select id="buyProductSelect">
+            <option value="">Chagua Bidhaa...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Idadi Iliyopokelewa (Qty):</label>
+          <input type="number" id="buyQty" value="5" min="1">
+        </div>
+        <button type="button" class="btn-brown" onclick="processStockIn()">+ Ongeza Kwenye Stock</button>
+      </div>
+    </div>
+
+    <!-- 4. SALES PAGE (POS) -->
+    <div id="salesPage" class="page-section">
+      <div class="top-bar">
+        <div>
+          <p class="subtitle">Point of Sale</p>
+          <h1>Fanya Mauzo (POS)</h1>
+        </div>
+      </div>
+      <div class="card" style="max-width: 500px;">
+        <div class="form-group">
+          <label>Chagua Spare Part Inayouzwa:</label>
+          <select id="saleProductSelect">
+            <option value="">Chagua Bidhaa...</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Idadi Inayouzwa:</label>
+            <input type="number" id="saleQty" value="1" min="1">
+          </div>
+          <div class="form-group">
+            <label>Jina la Mteja (Sio Lazima):</label>
+            <input type="text" id="saleCustomer" placeholde
