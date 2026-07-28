@@ -13,7 +13,7 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>
-        .sidebar-item-active { background-color: #f3f4f6; color: #1f2937; font-weight: 600; }
+        .nav-item-active { background-color: #f3f4f6; color: #1d4ed8; font-weight: 700; }
         @media print {
             body * { visibility: hidden; }
             #printable-receipt, #printable-receipt * { visibility: visible; }
@@ -22,7 +22,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 font-sans antialiased">
 
     <!-- LOGIN OVERLAY -->
     <div id="login-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
@@ -69,13 +69,24 @@
         </div>
     </div>
 
-    <!-- MAIN APP WRAPPER -->
-    <div class="flex h-screen overflow-hidden">
+    <!-- MAIN APP LAYOUT -->
+    <div class="flex flex-col lg:flex-row h-screen overflow-hidden">
 
-        <!-- SIDEBAR -->
-        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col justify-between no-print">
+        <!-- MOBILE HEADER BAR -->
+        <header class="lg:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center no-print">
+            <div class="flex items-center">
+                <i class="fa-solid fa-boxes-packing text-blue-600 text-2xl mr-2"></i>
+                <span class="text-lg font-bold text-gray-800">NMA 100%</span>
+            </div>
+            <button onclick="toggleMobileSidebar()" class="text-gray-600 hover:text-gray-900 focus:outline-none text-2xl">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </header>
+
+        <!-- SIDEBAR NAVIGATION -->
+        <aside id="sidebar" class="w-full lg:w-64 bg-white border-r border-gray-200 flex flex-col justify-between hidden lg:flex no-print z-40">
             <div>
-                <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200">
+                <div class="h-16 hidden lg:flex items-center justify-between px-6 border-b border-gray-200">
                     <div class="flex items-center">
                         <i class="fa-solid fa-boxes-packing text-blue-600 text-2xl mr-3"></i>
                         <span class="text-xl font-bold text-gray-800 tracking-wide">NMA 100%</span>
@@ -97,48 +108,47 @@
                 </div>
 
                 <nav class="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-250px)]">
-                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition nav-item-active">
                         <i class="fa-solid fa-chart-pie w-6 text-gray-500"></i>
                         <span>Dashboard</span>
                     </button>
 
-                    <!-- TAB YA MATAWI (BRANCHES) - IPO PERMANENT -->
-                    <button onclick="switchTab('branches')" id="nav-branches" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition font-semibold text-blue-600">
+                    <button onclick="switchTab('branches')" id="nav-branches" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition font-semibold text-blue-600">
                         <i class="fa-solid fa-code-branch w-6 text-blue-600"></i>
                         <span>Matawi (Branches)</span>
                     </button>
 
-                    <button onclick="switchTab('pos')" id="nav-pos" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('pos')" id="nav-pos" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-cart-shopping w-6 text-gray-500"></i>
                         <span>Sales (POS)</span>
                     </button>
 
-                    <button onclick="switchTab('products')" id="nav-products" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('products')" id="nav-products" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-box w-6 text-gray-500"></i>
                         <span>Products & Stock</span>
                     </button>
 
-                    <button onclick="switchTab('stock-logs')" id="nav-stock-logs" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('stock-logs')" id="nav-stock-logs" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-truck-ramp-box w-6 text-gray-500"></i>
                         <span>Kumbukumbu za Mzigo</span>
                     </button>
 
-                    <button onclick="switchTab('customers')" id="nav-customers" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('customers')" id="nav-customers" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-users w-6 text-gray-500"></i>
                         <span>Wateja (Customers)</span>
                     </button>
 
-                    <button onclick="switchTab('suppliers')" id="nav-suppliers" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('suppliers')" id="nav-suppliers" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-truck-field w-6 text-gray-500"></i>
                         <span>Wasambazaji</span>
                     </button>
 
-                    <button onclick="switchTab('reports')" id="nav-reports" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-file-invoice-dollar w-6 text-gray-500"></i>
                         <span>Ripoti za Mauzo</span>
                     </button>
 
-                    <button onclick="switchTab('users')" id="nav-users" class="w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('users')" id="nav-users" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-user-gear w-6 text-gray-500"></i>
                         <span>Watumiaji & Passwords</span>
                     </button>
@@ -152,8 +162,8 @@
             </div>
         </aside>
 
-        <!-- CONTENT AREA -->
-        <main class="flex-1 overflow-y-auto bg-gray-50 p-6 no-print">
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 sm:p-6 no-print">
 
             <!-- DASHBOARD SECTION -->
             <section id="section-dashboard" class="tab-content space-y-6">
@@ -165,13 +175,13 @@
 
                     <div class="flex items-center gap-2 bg-white p-2 border rounded-xl shadow-sm">
                         <label class="text-xs font-bold text-gray-600"><i class="fa-solid fa-filter mr-1"></i>Chuja Tawi:</label>
-                        <select id="dash-branch-filter" onchange="renderDashboard()" class="text-sm font-semibold bg-gray-50 p-1.5 border rounded-lg focus:outline-none">
+                        <select id="dash-branch-filter" onchange="renderAll()" class="text-sm font-semibold bg-gray-50 p-1.5 border rounded-lg focus:outline-none">
                             <option value="ALL">Matawi Yote (All Branches)</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                     <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                         <p class="text-sm font-medium text-gray-500">Mauzo ya Leo</p>
                         <h3 id="dash-today-sales" class="text-2xl font-extrabold text-gray-800 mt-2">TSH 0</h3>
@@ -201,18 +211,18 @@
 
             <!-- BRANCHES MANAGEMENT SECTION -->
             <section id="section-branches" class="tab-content hidden space-y-6">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800">Usimamizi wa Matawi (Branches)</h2>
                         <p class="text-xs text-gray-500">Ongeza Matawi na kuteua ma-Admin pamoja na Cashier hapo hapo.</p>
                     </div>
-                    <button onclick="openBranchModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700">
+                    <button onclick="openBranchModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition">
                         <i class="fa-solid fa-plus mr-1"></i> Ongeza Tawi & Admin Jipya
                     </button>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <table class="w-full text-left border-collapse">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
                         <thead class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
                             <tr>
                                 <th class="p-4">Jina la Tawi</th>
@@ -240,7 +250,7 @@
                                     <i class="fa-solid fa-barcode absolute left-3 top-3 text-gray-400"></i>
                                     <input type="text" id="hardware-barcode" placeholder="Scan Barcode hapa..." onchange="handleHardwareScan(this.value)" class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                                 </div>
-                                <button onclick="toggleCameraScanner()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                                <button onclick="toggleCameraScanner()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition">
                                     <i class="fa-solid fa-camera"></i> <span>Kamera</span>
                                 </button>
                             </div>
@@ -297,13 +307,13 @@
             <section id="section-products" class="tab-content hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h2 class="text-2xl font-bold text-gray-800">Usimamizi wa Bidhaa & Stoo</h2>
-                    <button onclick="openProductModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700">
+                    <button onclick="openProductModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition">
                         <i class="fa-solid fa-plus mr-1"></i> Ongeza Bidhaa Mpya
                     </button>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <table class="w-full text-left border-collapse">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
                             <tr>
                                 <th class="p-4">Barcode</th>
@@ -326,8 +336,8 @@
                     <h2 class="text-2xl font-bold text-gray-800">Kumbukumbu za Mzigo Ulioingizwa</h2>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <table class="w-full text-left border-collapse">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[650px]">
                         <thead class="bg-blue-50 border-b text-xs font-semibold text-blue-900 uppercase">
                             <tr>
                                 <th class="p-4">Tarehe & Muda</th>
@@ -347,13 +357,13 @@
             <section id="section-customers" class="tab-content hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h2 class="text-2xl font-bold text-gray-800">Usimamizi wa Wateja</h2>
-                    <button onclick="openCustomerModal()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-emerald-700">
+                    <button onclick="openCustomerModal()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-emerald-700 transition">
                         <i class="fa-solid fa-user-plus mr-1"></i> Ongeza Mteja
                     </button>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <table class="w-full text-left border-collapse">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
                         <thead class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
                             <tr>
                                 <th class="p-4">Jina</th>
@@ -372,13 +382,13 @@
             <section id="section-suppliers" class="tab-content hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h2 class="text-2xl font-bold text-gray-800">Wasambazaji (Suppliers)</h2>
-                    <button onclick="openSupplierModal()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-purple-700">
+                    <button onclick="openSupplierModal()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-purple-700 transition">
                         <i class="fa-solid fa-truck-arrow-right mr-1"></i> Ongeza Msambazaji
                     </button>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <table class="w-full text-left border-collapse">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
                         <thead class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
                             <tr>
                                 <th class="p-4">Kampuni / Jina</th>
@@ -426,18 +436,18 @@
 
             <!-- USERS SECTION -->
             <section id="section-users" class="tab-content hidden space-y-6">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800">Usimamizi wa Watumiaji</h2>
                         <p class="text-xs text-gray-500">Orodha ya ma-Admin na Cashiers wote kwa kila tawi.</p>
                     </div>
-                    <button onclick="openUserModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700">
+                    <button onclick="openUserModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition">
                         <i class="fa-solid fa-user-plus mr-1"></i> Ongeza Mtumiaji Mpya
                     </button>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <table class="w-full text-left border-collapse">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
                             <tr>
                                 <th class="p-4">Jina la Mtumiaji</th>
@@ -456,7 +466,7 @@
         </main>
     </div>
 
-    <!-- PRINTABLE RECEIPT -->
+    <!-- PRINTABLE RECEIPT TEMPLATE -->
     <div id="printable-receipt" class="p-6 max-w-sm mx-auto font-mono text-sm">
         <div class="text-center border-b pb-3 mb-3">
             <h2 class="text-xl font-bold uppercase">NMA 100%</h2>
@@ -482,39 +492,39 @@
         <p class="text-center text-xs mt-6">*** Asante kwa Kufanya Kazi Nasi! ***</p>
     </div>
 
-    <!-- MODALS -->
+    <!-- MODAL DIALOGS -->
     
-    <!-- BRANCH MODAL WITH INTEGRATED USER CREATION -->
+    <!-- BRANCH MODAL -->
     <div id="branch-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
             <h3 class="text-lg font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-code-branch text-blue-600 mr-2"></i>Ongeza Tawi Jipya & Mtumiaji</h3>
             
             <div class="space-y-2">
                 <label class="block text-xs font-bold text-gray-600 uppercase">1. Taarifa za Tawi</label>
-                <input type="text" id="branch-name" placeholder="Jina la Tawi (Mf: Tawi la Kariakoo)" class="w-full p-2 border rounded-lg text-sm">
-                <input type="text" id="branch-location" placeholder="Eneo / Anwani (Mf: Mtaa wa Aggrey)" class="w-full p-2 border rounded-lg text-sm">
+                <input type="text" id="branch-name" placeholder="Jina la Tawi (Mf: Tawi la Kariakoo)" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                <input type="text" id="branch-location" placeholder="Eneo / Anwani (Mf: Mtaa wa Aggrey)" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
             </div>
 
             <div class="space-y-2 pt-2 border-t">
                 <label class="block text-xs font-bold text-gray-600 uppercase">2. Mtumiaji wa Tawi Hili</label>
-                <input type="text" id="branch-admin-name" placeholder="Jina la Admin/Mhudumu wa Tawi" class="w-full p-2 border rounded-lg text-sm">
+                <input type="text" id="branch-admin-name" placeholder="Jina la Admin/Mhudumu wa Tawi" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                 <select id="branch-admin-role" class="w-full p-2 border rounded-lg text-sm bg-gray-50 font-semibold">
                     <option value="admin">Admin wa Tawi (Branch Admin)</option>
                     <option value="cashier">Mhudumu (Cashier)</option>
                 </select>
-                <input type="password" id="branch-admin-pass" placeholder="Password ya Mtumiaji Huyu" class="w-full p-2 border rounded-lg text-sm">
+                <input type="password" id="branch-admin-pass" placeholder="Password ya Mtumiaji Huyu" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
             </div>
 
             <div class="flex justify-end gap-2 border-t pt-3">
                 <button onclick="closeBranchModal()" class="px-4 py-2 border rounded-lg text-sm">Ghairi</button>
-                <button onclick="saveBranch()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold"><i class="fa-solid fa-check mr-1"></i> Hifadhi Tawi</button>
+                <button onclick="saveBranch()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition"><i class="fa-solid fa-check mr-1"></i> Hifadhi Tawi</button>
             </div>
         </div>
     </div>
 
     <!-- PRODUCT MODAL -->
     <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
             <h3 class="text-lg font-bold text-gray-800">Ongeza Bidhaa Mpya</h3>
             <div>
                 <label class="block text-xs font-semibold text-gray-500 mb-1">Tawi la Bidhaa Hii</label>
@@ -524,7 +534,7 @@
                 <label class="block text-xs font-semibold text-gray-500 mb-1">Barcode</label>
                 <div class="flex gap-2">
                     <input type="text" id="prod-barcode" placeholder="Scan au andika barcode..." class="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                    <button type="button" onclick="toggleModalCameraScanner()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-semibold flex items-center gap-1 text-sm">
+                    <button type="button" onclick="toggleModalCameraScanner()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-semibold flex items-center gap-1 text-sm transition">
                         <i class="fa-solid fa-camera"></i> Scan
                     </button>
                 </div>
@@ -542,14 +552,14 @@
             </div>
             <div class="flex justify-end gap-2">
                 <button onclick="closeProductModal()" class="px-4 py-2 border rounded-lg">Ghairi</button>
-                <button onclick="saveProduct()" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Hifadhi</button>
+                <button onclick="saveProduct()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Hifadhi</button>
             </div>
         </div>
     </div>
 
     <!-- RESTOCK MODAL -->
     <div id="restock-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
             <h3 class="text-lg font-bold text-gray-800">Ongeza Mzigo Mpya Stoo</h3>
             <p id="restock-prod-name" class="font-bold text-blue-600 text-sm"></p>
             <input type="hidden" id="restock-prod-index">
@@ -560,40 +570,42 @@
             </div>
             <div class="flex justify-end gap-2">
                 <button onclick="closeRestockModal()" class="px-4 py-2 border rounded-lg">Ghairi</button>
-                <button onclick="saveRestock()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg">Ongeza Stoo</button>
+                <button onclick="saveRestock()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Ongeza Stoo</button>
             </div>
         </div>
     </div>
 
+    <!-- CUSTOMER MODAL -->
     <div id="customer-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
             <h3 class="text-lg font-bold text-gray-800">Ongeza Mteja Mpya</h3>
             <input type="text" id="cust-name" placeholder="Jina la Mteja" class="w-full p-2 border rounded-lg">
             <input type="text" id="cust-phone" placeholder="Namba ya Simu" class="w-full p-2 border rounded-lg">
             <input type="text" id="cust-address" placeholder="Anwani / Eneo" class="w-full p-2 border rounded-lg">
             <div class="flex justify-end gap-2">
                 <button onclick="closeCustomerModal()" class="px-4 py-2 border rounded-lg">Ghairi</button>
-                <button onclick="saveCustomer()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg">Hifadhi</button>
+                <button onclick="saveCustomer()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Hifadhi</button>
             </div>
         </div>
     </div>
 
+    <!-- SUPPLIER MODAL -->
     <div id="supplier-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
             <h3 class="text-lg font-bold text-gray-800">Ongeza Msambazaji Mpya</h3>
             <input type="text" id="supp-name" placeholder="Jina la Kampuni" class="w-full p-2 border rounded-lg">
             <input type="text" id="supp-phone" placeholder="Namba ya Simu" class="w-full p-2 border rounded-lg">
             <input type="text" id="supp-items" placeholder="Aina ya Bidhaa" class="w-full p-2 border rounded-lg">
             <div class="flex justify-end gap-2">
                 <button onclick="closeSupplierModal()" class="px-4 py-2 border rounded-lg">Ghairi</button>
-                <button onclick="saveSupplier()" class="px-4 py-2 bg-purple-600 text-white rounded-lg">Hifadhi</button>
+                <button onclick="saveSupplier()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">Hifadhi</button>
             </div>
         </div>
     </div>
 
     <!-- USER MODAL -->
     <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
             <h3 class="text-lg font-bold text-gray-800">Ongeza Mtumiaji Mpya</h3>
             <input type="text" id="new-user-name" placeholder="Jina la Mtumiaji" class="w-full p-2 border rounded-lg">
             <div>
@@ -611,12 +623,12 @@
             <input type="password" id="new-user-pass" placeholder="Password" class="w-full p-2 border rounded-lg">
             <div class="flex justify-end gap-2">
                 <button onclick="closeUserModal()" class="px-4 py-2 border rounded-lg">Ghairi</button>
-                <button onclick="saveUser()" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Hifadhi</button>
+                <button onclick="saveUser()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Hifadhi</button>
             </div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- SYSTEM LOGIC -->
     <script>
         const MIN_STOCK_ALERT = 3;
 
@@ -654,7 +666,11 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // 1. POPULATE BRANCHES ON LOGIN DROPDOWN
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+        }
+
         function populateLoginBranches() {
             const branchSelect = document.getElementById('login-branch-select');
             branchSelect.innerHTML = `<option value="ALL">--- Matawi Yote / Super Admin ---</option>` +
@@ -663,7 +679,6 @@
             onLoginBranchChange();
         }
 
-        // 2. WHEN BRANCH SELECT IS CHANGED, FILTER USERS FOR THAT BRANCH ONLY
         function onLoginBranchChange() {
             const selectedBranch = document.getElementById('login-branch-select').value;
             const userSelect = document.getElementById('login-user-select');
@@ -725,7 +740,17 @@
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`section-${tabId}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('nav-item-active'));
+            
+            const targetSection = document.getElementById(`section-${tabId}`);
+            const targetNav = document.getElementById(`nav-${tabId}`);
+
+            if (targetSection) targetSection.classList.remove('hidden');
+            if (targetNav) targetNav.classList.add('nav-item-active');
+
+            if (window.innerWidth < 1024) {
+                document.getElementById('sidebar').classList.add('hidden');
+            }
         }
 
         function renderAll() {
@@ -746,7 +771,6 @@
         function openBranchModal() { document.getElementById('branch-modal').classList.remove('hidden'); }
         function closeBranchModal() { document.getElementById('branch-modal').classList.add('hidden'); }
         
-        // HIFADHI TAWI NA MTUMIAJI WAKE HAPO HAPO
         function saveBranch() {
             const name = document.getElementById('branch-name').value.trim();
             const location = document.getElementById('branch-location').value.trim();
@@ -798,7 +822,7 @@
                         <td class="p-4 text-gray-600">${b.location || 'N/A'}</td>
                         <td class="p-4"><span class="px-2 py-1 bg-blue-50 text-blue-800 rounded font-bold text-xs">${branchAdmin ? branchAdmin.name : 'Hana Admin'}</span></td>
                         <td class="p-4 text-center">
-                            <button onclick="deleteBranch(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="deleteBranch(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
@@ -810,6 +834,7 @@
             const userBranchSelect = document.getElementById('new-user-branch');
             const filterSelect = document.getElementById('dash-branch-filter');
 
+            const currentVal = filterSelect ? filterSelect.value : 'ALL';
             const options = branches.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
 
             if (prodSelect) prodSelect.innerHTML = options;
@@ -819,6 +844,7 @@
 
             if (filterSelect) {
                 filterSelect.innerHTML = `<option value="ALL">Matawi Yote (All Branches)</option>` + options;
+                filterSelect.value = currentVal;
             }
         }
 
@@ -849,12 +875,12 @@
                     <td class="p-4 font-semibold text-gray-600">${u.branch}</td>
                     <td class="p-4 font-mono text-gray-600">${u.pass}</td>
                     <td class="p-4 text-center">
-                        <button onclick="changeUserPassword(${index})" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs font-semibold">
+                        <button onclick="changeUserPassword(${index})" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs font-semibold transition">
                             <i class="fa-solid fa-key mr-1"></i> Badili Password
                         </button>
                     </td>
                     <td class="p-4 text-center">
-                        ${users.length > 1 ? `<button onclick="deleteUser(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>` : '-'}
+                        ${users.length > 1 ? `<button onclick="deleteUser(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>` : '-'}
                     </td>
                 </tr>
             `).join('');
@@ -875,7 +901,7 @@
             const tbody = document.getElementById('products-table-body');
             const displayProducts = getScopedProducts();
 
-            tbody.innerHTML = displayProducts.map((p, index) => {
+            tbody.innerHTML = displayProducts.map((p) => {
                 const isLowStock = p.stock <= MIN_STOCK_ALERT;
                 const realIndex = products.findIndex(item => item.barcode === p.barcode);
                 return `
@@ -891,7 +917,7 @@
                             </span>
                         </td>
                         <td class="p-4 text-center flex justify-center gap-2">
-                            <button onclick="openRestockModal(${realIndex})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold">
+                            <button onclick="openRestockModal(${realIndex})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold transition">
                                 <i class="fa-solid fa-plus"></i> Restock
                             </button>
                             <button onclick="deleteProduct(${realIndex})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
@@ -904,8 +930,12 @@
         function renderStockLogs() {
             const tbody = document.getElementById('stock-logs-table-body');
             let logs = stockLogs;
-            if (currentUser && currentUser.role !== 'superadmin') {
-                logs = stockLogs.filter(l => l.branch === currentUser.branch);
+            
+            if (currentUser) {
+                const filter = currentUser.role === 'superadmin' ? (document.getElementById('dash-branch-filter')?.value || 'ALL') : currentUser.branch;
+                if (filter !== 'ALL') {
+                    logs = stockLogs.filter(l => l.branch === filter);
+                }
             }
 
             if (logs.length === 0) {
@@ -933,7 +963,7 @@
                     <td class="p-4">${c.address}</td>
                     <td class="p-4 font-bold text-red-600">TSH ${c.debt || 0}</td>
                     <td class="p-4 text-center">
-                        <button onclick="deleteCustomer(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="deleteCustomer(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
@@ -947,7 +977,7 @@
                     <td class="p-4">${s.phone}</td>
                     <td class="p-4"><span class="px-2 py-1 bg-purple-50 text-purple-700 rounded">${s.items}</span></td>
                     <td class="p-4 text-center">
-                        <button onclick="deleteSupplier(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="deleteSupplier(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
@@ -956,6 +986,11 @@
         function renderPosGrid() {
             const grid = document.getElementById('pos-products-grid');
             const displayProducts = getScopedProducts();
+
+            if (displayProducts.length === 0) {
+                grid.innerHTML = `<p class="text-gray-400 text-xs col-span-3 text-center py-4">Hakuna bidhaa za kuonyesha.</p>`;
+                return;
+            }
 
             grid.innerHTML = displayProducts.map(p => `
                 <div onclick="addToCart('${p.barcode}')" class="p-3 border rounded-xl hover:shadow-md cursor-pointer transition bg-gray-50 flex flex-col justify-between">
@@ -1039,7 +1074,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-sm">TSH ${subtotal}</span>
-                            <button onclick="removeFromCart(${index})" class="text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                     </div>
                 `;
@@ -1151,7 +1186,8 @@
             const scopedProducts = getScopedProducts();
             const scopedSales = getScopedSales();
 
-            document.getElementById('dashboard-scope-text').innerText = `Unatazama data za tawi la: ${currentUser ? (currentUser.branch === 'ALL' ? 'Matawi Yote' : currentUser.branch) : 'Tawi Kuu'}`;
+            const currentFilter = currentUser?.role === 'superadmin' ? document.getElementById('dash-branch-filter')?.value || 'ALL' : currentUser?.branch;
+            document.getElementById('dashboard-scope-text').innerText = `Unatazama data za tawi la: ${currentFilter === 'ALL' ? 'Matawi Yote' : currentFilter}`;
 
             document.getElementById('dash-total-products').innerText = scopedProducts.length;
             
@@ -1272,6 +1308,12 @@
             localStorage.setItem('nma_products', JSON.stringify(products));
             localStorage.setItem('nma_stock_logs', JSON.stringify(stockLogs));
             
+            document.getElementById('prod-barcode').value = '';
+            document.getElementById('prod-name').value = '';
+            document.getElementById('prod-cost').value = '';
+            document.getElementById('prod-price').value = '';
+            document.getElementById('prod-stock').value = '';
+
             closeProductModal();
             renderAll();
         }
@@ -1303,6 +1345,8 @@
 
             localStorage.setItem('nma_products', JSON.stringify(products));
             localStorage.setItem('nma_stock_logs', JSON.stringify(stockLogs));
+            
+            document.getElementById('restock-qty').value = '';
             closeRestockModal();
             renderAll();
         }
@@ -1310,13 +1354,19 @@
         function openCustomerModal() { document.getElementById('customer-modal').classList.remove('hidden'); }
         function closeCustomerModal() { document.getElementById('customer-modal').classList.add('hidden'); }
         function saveCustomer() {
-            customers.push({
-                name: document.getElementById('cust-name').value,
-                phone: document.getElementById('cust-phone').value,
-                address: document.getElementById('cust-address').value,
-                debt: 0
-            });
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+
+            if (!name) return alert('Weka jina la mteja!');
+
+            customers.push({ name, phone, address, debt: 0 });
             localStorage.setItem('nma_customers', JSON.stringify(customers));
+
+            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-phone').value = '';
+            document.getElementById('cust-address').value = '';
+
             closeCustomerModal();
             renderAll();
         }
@@ -1324,12 +1374,19 @@
         function openSupplierModal() { document.getElementById('supplier-modal').classList.remove('hidden'); }
         function closeSupplierModal() { document.getElementById('supplier-modal').classList.add('hidden'); }
         function saveSupplier() {
-            suppliers.push({
-                name: document.getElementById('supp-name').value,
-                phone: document.getElementById('supp-phone').value,
-                items: document.getElementById('supp-items').value
-            });
+            const name = document.getElementById('supp-name').value.trim();
+            const phone = document.getElementById('supp-phone').value.trim();
+            const items = document.getElementById('supp-items').value.trim();
+
+            if (!name) return alert('Weka jina la msambazaji!');
+
+            suppliers.push({ name, phone, items });
             localStorage.setItem('nma_suppliers', JSON.stringify(suppliers));
+
+            document.getElementById('supp-name').value = '';
+            document.getElementById('supp-phone').value = '';
+            document.getElementById('supp-items').value = '';
+
             closeSupplierModal();
             renderAll();
         }
@@ -1346,6 +1403,10 @@
 
             users.push({ name, role, branch, pass });
             localStorage.setItem('nma_users', JSON.stringify(users));
+
+            document.getElementById('new-user-name').value = '';
+            document.getElementById('new-user-pass').value = '';
+
             closeUserModal();
             renderUsers();
             populateLoginBranches();
