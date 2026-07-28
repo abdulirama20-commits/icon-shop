@@ -36,13 +36,13 @@
             </div>
 
             <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
-                <!-- 1. CHAGUA TAWI FIRST -->
+                <!-- 1. CHAGUA TAWI -->
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1"><i class="fa-solid fa-code-branch text-blue-600 mr-1"></i> Chagua Tawi</label>
                     <select id="login-branch-select" onchange="onLoginBranchChange()" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50 font-semibold"></select>
                 </div>
 
-                <!-- 2. CHAGUA MTUMIAJI (FILTERED BY BRANCH) -->
+                <!-- 2. CHAGUA MTUMIAJI -->
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1"><i class="fa-solid fa-user text-blue-600 mr-1"></i> Chagua Mtumiaji / Mhudumu</label>
                     <select id="login-user-select" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
@@ -70,10 +70,10 @@
     </div>
 
     <!-- MAIN APP LAYOUT -->
-    <div class="flex flex-col lg:flex-row h-screen overflow-hidden">
+    <div class="flex flex-col md:flex-row h-screen overflow-hidden">
 
         <!-- MOBILE HEADER BAR -->
-        <header class="lg:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center no-print">
+        <header class="md:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center no-print">
             <div class="flex items-center">
                 <i class="fa-solid fa-boxes-packing text-blue-600 text-2xl mr-2"></i>
                 <span class="text-lg font-bold text-gray-800">NMA 100%</span>
@@ -84,9 +84,9 @@
         </header>
 
         <!-- SIDEBAR NAVIGATION -->
-        <aside id="sidebar" class="w-full lg:w-64 bg-white border-r border-gray-200 flex flex-col justify-between hidden lg:flex no-print z-40">
+        <aside id="sidebar" class="w-full md:w-64 bg-white border-r border-gray-200 flex-col justify-between hidden md:flex no-print z-40 shrink-0">
             <div>
-                <div class="h-16 hidden lg:flex items-center justify-between px-6 border-b border-gray-200">
+                <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200">
                     <div class="flex items-center">
                         <i class="fa-solid fa-boxes-packing text-blue-600 text-2xl mr-3"></i>
                         <span class="text-xl font-bold text-gray-800 tracking-wide">NMA 100%</span>
@@ -113,8 +113,8 @@
                         <span>Dashboard</span>
                     </button>
 
-                    <button onclick="switchTab('branches')" id="nav-branches" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition font-semibold text-blue-600">
-                        <i class="fa-solid fa-code-branch w-6 text-blue-600"></i>
+                    <button onclick="switchTab('branches')" id="nav-branches" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                        <i class="fa-solid fa-code-branch w-6 text-gray-500"></i>
                         <span>Matawi (Branches)</span>
                     </button>
 
@@ -260,7 +260,7 @@
                         </div>
 
                         <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                            <input type="text" id="pos-search" onkeyup="filterPosProducts()" placeholder="Tafuta bidhaa kwa jina..." class="w-full px-4 py-2 border rounded-lg mb-4">
+                            <input type="text" id="pos-search" onkeyup="filterPosProducts()" placeholder="Tafuta bidhaa kwa jina au barcode..." class="w-full px-4 py-2 border rounded-lg mb-4">
                             <div id="pos-products-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-96 overflow-y-auto"></div>
                         </div>
                     </div>
@@ -492,7 +492,7 @@
         <p class="text-center text-xs mt-6">*** Asante kwa Kufanya Kazi Nasi! ***</p>
     </div>
 
-    <!-- MODAL DIALOGS -->
+    <!-- MODALS -->
     
     <!-- BRANCH MODAL -->
     <div id="branch-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
@@ -628,7 +628,7 @@
         </div>
     </div>
 
-    <!-- SYSTEM LOGIC -->
+    <!-- GLOBAL APPLICATION LOGIC -->
     <script>
         const MIN_STOCK_ALERT = 3;
 
@@ -660,8 +660,10 @@
             const now = new Date();
             const dateStr = now.toLocaleDateString('sw-TZ', { day: '2-digit', month: '2-digit', year: 'numeric' });
             const timeStr = now.toLocaleTimeString('sw-TZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            document.getElementById('live-date').innerHTML = `<i class="fa-regular fa-calendar mr-1"></i>${dateStr}`;
-            document.getElementById('live-time').innerHTML = `<i class="fa-regular fa-clock mr-1"></i>${timeStr}`;
+            const dateEl = document.getElementById('live-date');
+            const timeEl = document.getElementById('live-time');
+            if (dateEl) dateEl.innerHTML = `<i class="fa-regular fa-calendar mr-1"></i>${dateStr}`;
+            if (timeEl) timeEl.innerHTML = `<i class="fa-regular fa-clock mr-1"></i>${timeStr}`;
         }
         setInterval(updateClock, 1000);
         updateClock();
@@ -669,10 +671,12 @@
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('flex');
         }
 
         function populateLoginBranches() {
             const branchSelect = document.getElementById('login-branch-select');
+            if (!branchSelect) return;
             branchSelect.innerHTML = `<option value="ALL">--- Matawi Yote / Super Admin ---</option>` +
                 branches.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
             
@@ -748,8 +752,10 @@
             if (targetSection) targetSection.classList.remove('hidden');
             if (targetNav) targetNav.classList.add('nav-item-active');
 
-            if (window.innerWidth < 1024) {
-                document.getElementById('sidebar').classList.add('hidden');
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('flex');
             }
         }
 
@@ -903,7 +909,7 @@
 
             tbody.innerHTML = displayProducts.map((p) => {
                 const isLowStock = p.stock <= MIN_STOCK_ALERT;
-                const realIndex = products.findIndex(item => item.barcode === p.barcode);
+                const realIndex = products.findIndex(item => item.barcode === p.barcode && item.branch === p.branch);
                 return `
                     <tr class="hover:bg-gray-50 ${isLowStock ? 'bg-red-50' : ''}">
                         <td class="p-4 font-mono font-semibold text-blue-600">${p.barcode || 'N/A'}</td>
@@ -1012,6 +1018,11 @@
             const filtered = displayProducts.filter(p => p.name.toLowerCase().includes(query) || (p.barcode && p.barcode.toLowerCase().includes(query)));
             
             const grid = document.getElementById('pos-products-grid');
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p class="text-gray-400 text-xs col-span-3 text-center py-4">Hamna bidhaa inayofanana.</p>`;
+                return;
+            }
+
             grid.innerHTML = filtered.map(p => `
                 <div onclick="addToCart('${p.barcode}')" class="p-3 border rounded-xl hover:shadow-md cursor-pointer transition bg-gray-50 flex flex-col justify-between">
                     <div>
@@ -1044,7 +1055,7 @@
             const product = displayProducts.find(p => p.barcode === barcode);
             if (!product || product.stock <= 0) return alert('Bidhaa haipo au imeisha stoo!');
 
-            const existing = cart.find(item => item.barcode === barcode);
+            const existing = cart.find(item => item.barcode === barcode && item.branch === product.branch);
             if (existing) {
                 if (existing.qty < product.stock) existing.qty++;
                 else alert('Umekamilisha idadi yote iliyopo stoo!');
@@ -1096,7 +1107,7 @@
             }
 
             cart.forEach(cartItem => {
-                const p = products.find(prod => prod.barcode === cartItem.barcode);
+                const p = products.find(prod => prod.barcode === cartItem.barcode && prod.branch === cartItem.branch);
                 if (p) p.stock -= cartItem.qty;
             });
 
@@ -1157,7 +1168,7 @@
                 html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
                 html5QrcodeScanner.render((decodedText) => {
                     addToCart(decodedText);
-                    html5QrcodeScanner.clear();
+                    if (html5QrcodeScanner) html5QrcodeScanner.clear();
                     container.classList.add('hidden');
                 });
             } else {
@@ -1173,7 +1184,7 @@
                 modalQrcodeScanner = new Html5QrcodeScanner("modal-reader", { fps: 10, qrbox: 200 });
                 modalQrcodeScanner.render((decodedText) => {
                     document.getElementById('prod-barcode').value = decodedText;
-                    modalQrcodeScanner.clear();
+                    if (modalQrcodeScanner) modalQrcodeScanner.clear();
                     container.classList.add('hidden');
                 });
             } else {
@@ -1187,7 +1198,8 @@
             const scopedSales = getScopedSales();
 
             const currentFilter = currentUser?.role === 'superadmin' ? document.getElementById('dash-branch-filter')?.value || 'ALL' : currentUser?.branch;
-            document.getElementById('dashboard-scope-text').innerText = `Unatazama data za tawi la: ${currentFilter === 'ALL' ? 'Matawi Yote' : currentFilter}`;
+            const scopeText = document.getElementById('dashboard-scope-text');
+            if (scopeText) scopeText.innerText = `Unatazama data za tawi la: ${currentFilter === 'ALL' ? 'Matawi Yote' : currentFilter}`;
 
             document.getElementById('dash-total-products').innerText = scopedProducts.length;
             
