@@ -62,11 +62,11 @@
 
             <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1"><i class="fa-solid fa-code-branch text-blue-600 mr-1"></i> Chagua Tawi</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-1"><i class="fa-solid fa-code-branch text-blue-600 mr-1"></i> Chagua Tawi / Nafasi</label>
                     <select id="login-branch-select" onchange="onLoginBranchChange()" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50 font-semibold"></select>
                 </div>
 
-                <div>
+                <div id="login-user-container">
                     <label class="block text-sm font-bold text-gray-700 mb-1"><i class="fa-solid fa-user text-blue-600 mr-1"></i> Chagua Mtumiaji / Mhudumu</label>
                     <select id="login-user-select" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                 </div>
@@ -133,25 +133,21 @@
                 </div>
 
                 <nav class="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-250px)]">
-                    <!-- Dashboard binafsi/Kuu -->
                     <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn admin-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition nav-item-active">
                         <i class="fa-solid fa-chart-pie w-6 text-gray-500"></i>
                         <span>Dashboard</span>
                     </button>
                     
-                    <!-- Sales / POS (Kazi Kuu ya Cashier) -->
                     <button onclick="switchTab('pos')" id="nav-pos" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-cart-shopping w-6 text-gray-500"></i>
                         <span>Mauzo (POS)</span>
                     </button>
 
-                    <!-- Shift Summary / Zamu ya Cashier -->
                     <button onclick="switchTab('cashier-shift')" id="nav-cashier-shift" class="nav-btn cashier-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-receipt w-6 text-gray-500"></i>
                         <span>Zamu Yangu & Risiti</span>
                     </button>
 
-                    <!-- Menyu za Supervisor / Admin Pekee -->
                     <button onclick="switchTab('branches')" id="nav-branches" class="nav-btn supervisor-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-code-branch w-6 text-gray-500"></i>
                         <span>Matawi (Branches)</span>
@@ -193,7 +189,7 @@
         <!-- MAIN CONTENT AREA -->
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 sm:p-6 no-print">
 
-            <!-- DASHBOARD SECTION (ADMIN ONLY) -->
+            <!-- DASHBOARD SECTION -->
             <section id="section-dashboard" class="tab-content space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -237,7 +233,7 @@
                 </div>
             </section>
 
-            <!-- CASHIER SHIFT SUMMARY & REPRINT RECEIPT SECTION -->
+            <!-- CASHIER SHIFT SECTION -->
             <section id="section-cashier-shift" class="tab-content hidden space-y-6">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">Zamu Yangu & Risiti za Leo</h2>
@@ -265,7 +261,7 @@
                 </div>
             </section>
 
-            <!-- BRANCHES MANAGEMENT SECTION -->
+            <!-- BRANCHES SECTION -->
             <section id="section-branches" class="tab-content hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -292,7 +288,7 @@
                 </div>
             </section>
 
-            <!-- SALES (POS) SECTION -->
+            <!-- POS SECTION -->
             <section id="section-pos" class="tab-content hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h2 class="text-2xl font-bold text-gray-800">Sales (POS) & Barcode Scanner</h2>
@@ -752,19 +748,22 @@
 
         function onLoginBranchChange() {
             const selectedBranch = document.getElementById('login-branch-select').value;
+            const userContainer = document.getElementById('login-user-container');
             const userSelect = document.getElementById('login-user-select');
 
-            let filteredUsers = users;
             if (selectedBranch === 'SUPERVISOR') {
-                filteredUsers = users.filter(u => u.role === 'supervisor');
+                // Ficha uwanja wa mtumiaji ukiwa Supervisor
+                userContainer.classList.add('hidden');
             } else {
-                filteredUsers = users.filter(u => u.branch === selectedBranch && u.role !== 'supervisor');
-            }
+                // Onyesha uwanja wa mtumiaji ukiwa tawi lingine (Admin / Cashier)
+                userContainer.classList.remove('hidden');
+                let filteredUsers = users.filter(u => u.branch === selectedBranch && u.role !== 'supervisor');
 
-            if(filteredUsers.length === 0) {
-                userSelect.innerHTML = `<option value="">Hakuna Mtumiaji Tawi Hili</option>`;
-            } else {
-                userSelect.innerHTML = filteredUsers.map(u => `<option value="${escapeHTML(u.name)}">${escapeHTML(u.name)} (${escapeHTML(u.role.toUpperCase())})</option>`).join('');
+                if (filteredUsers.length === 0) {
+                    userSelect.innerHTML = `<option value="">Hakuna Mtumiaji Tawi Hili</option>`;
+                } else {
+                    userSelect.innerHTML = filteredUsers.map(u => `<option value="${escapeHTML(u.name)}">${escapeHTML(u.name)} (${escapeHTML(u.role.toUpperCase())})</option>`).join('');
+                }
             }
         }
 
@@ -779,13 +778,20 @@
 
         function handleLogin(e) {
             e.preventDefault();
-            const username = document.getElementById('login-user-select').value;
+            const selectedBranch = document.getElementById('login-branch-select').value;
             const pass = document.getElementById('login-password').value;
             const rememberMe = document.getElementById('remember-me').checked;
 
-            if(!username) return alert('Chagua mtumiaji!');
+            let foundUser = null;
 
-            const foundUser = users.find(u => u.name === username && u.pass === pass);
+            if (selectedBranch === 'SUPERVISOR') {
+                // Ukichagua Supervisor, kagua password ya supervisor yeyote anayelingana
+                foundUser = users.find(u => u.role === 'supervisor' && u.pass === pass);
+            } else {
+                const username = document.getElementById('login-user-select').value;
+                if (!username) return alert('Chagua mtumiaji!');
+                foundUser = users.find(u => u.name === username && u.pass === pass);
+            }
 
             if (foundUser) {
                 if (rememberMe) {
@@ -804,7 +810,6 @@
             document.getElementById('current-user-branch').innerText = user.role === 'supervisor' ? 'Matawi Yote' : (user.branch || 'Tawi Kuu');
             document.getElementById('role-badge').innerText = user.role.toUpperCase();
 
-            // Dhibiti Mwonekano kwa mujibu wa Supervisor vs Admin wa Tawi vs Cashier
             const supervisorElements = document.querySelectorAll('.supervisor-only');
             const adminElements = document.querySelectorAll('.admin-only');
             const cashierElements = document.querySelectorAll('.cashier-only');
@@ -820,11 +825,10 @@
                 cashierElements.forEach(el => el.classList.add('hidden'));
                 switchTab('dashboard');
             } else {
-                // KAMA NI CASHIER (DASHIBODI YAKE NA KAZI ZAKE TU)
                 supervisorElements.forEach(el => el.classList.add('hidden'));
                 adminElements.forEach(el => el.classList.add('hidden'));
                 cashierElements.forEach(el => el.classList.remove('hidden'));
-                switchTab('pos'); // Inamfikisha POS moja kwa moja
+                switchTab('pos');
             }
 
             renderAll();
@@ -1008,11 +1012,42 @@
             }
         }
 
+        function deleteUser(index) {
+            if (users.length <= 1) return alert('Huwezi kufuta mtumiaji wa mwisho!');
+            if (confirm(`Je, una uhakika unataka kufuta mtumiaji ${users[index].name}?`)) {
+                users.splice(index, 1);
+                localStorage.setItem('nma_users', JSON.stringify(users));
+                renderUsers();
+                populateLoginBranches();
+            }
+        }
+
+        function openUserModal() { document.getElementById('user-modal').classList.remove('hidden'); }
+        function closeUserModal() { document.getElementById('user-modal').classList.add('hidden'); }
+
+        function saveUser() {
+            const name = document.getElementById('new-user-name').value.trim();
+            const role = document.getElementById('new-user-role').value;
+            const branch = document.getElementById('new-user-branch').value;
+            const pass = document.getElementById('new-user-pass').value.trim();
+
+            if (!name || !pass) return alert('Tafadhali jaza jina na password!');
+
+            users.push({ name, role, branch, pass });
+            localStorage.setItem('nma_users', JSON.stringify(users));
+
+            document.getElementById('new-user-name').value = '';
+            document.getElementById('new-user-pass').value = '';
+            closeUserModal();
+            renderUsers();
+            populateLoginBranches();
+            alert('Mtumiaji mpya ameongezwa!');
+        }
+
         function renderProducts() {
             const tbody = document.getElementById('products-table-body');
             const displayProducts = getScopedProducts();
 
-            // Ficha au onyesha safu ya cost kulingana na role
             const costColumns = document.querySelectorAll('.cost-column');
             costColumns.forEach(el => {
                 if (currentUser && currentUser.role === 'cashier') el.classList.add('hidden');
@@ -1047,6 +1082,88 @@
                     </tr>
                 `;
             }).join('');
+        }
+
+        function openProductModal() { document.getElementById('product-modal').classList.remove('hidden'); }
+        function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
+
+        function saveProduct() {
+            const branch = document.getElementById('prod-branch-select').value;
+            const barcode = document.getElementById('prod-barcode').value.trim();
+            const name = document.getElementById('prod-name').value.trim();
+            const cost = Number(document.getElementById('prod-cost').value);
+            const price = Number(document.getElementById('prod-price').value);
+            const stock = Number(document.getElementById('prod-stock').value);
+            const supplier = document.getElementById('prod-supplier').value;
+
+            if (!name || isNaN(price)) return alert('Tafadhali jaza jina na bei ya kuuzia!');
+
+            products.push({ barcode, name, branch, cost, price, stock, supplier });
+            localStorage.setItem('nma_products', JSON.stringify(products));
+
+            if (stock > 0) {
+                stockLogs.push({
+                    date: new Date().toLocaleString('sw-TZ'),
+                    productName: name,
+                    branch: branch,
+                    qtyAdded: stock,
+                    supplier: supplier,
+                    addedBy: currentUser ? currentUser.name : 'Unknown'
+                });
+                localStorage.setItem('nma_stock_logs', JSON.stringify(stockLogs));
+            }
+
+            document.getElementById('prod-barcode').value = '';
+            document.getElementById('prod-name').value = '';
+            document.getElementById('prod-cost').value = '';
+            document.getElementById('prod-price').value = '';
+            document.getElementById('prod-stock').value = '';
+
+            closeProductModal();
+            renderAll();
+            alert('Bidhaa imeongezwa!');
+        }
+
+        function deleteProduct(index) {
+            if (confirm('Je, una uhakika unataka kufuta bidhaa hii?')) {
+                products.splice(index, 1);
+                localStorage.setItem('nma_products', JSON.stringify(products));
+                renderAll();
+            }
+        }
+
+        function openRestockModal(index) {
+            const p = products[index];
+            document.getElementById('restock-prod-name').innerText = `${p.name} (${p.branch})`;
+            document.getElementById('restock-prod-index').value = index;
+            document.getElementById('restock-modal').classList.remove('hidden');
+        }
+        function closeRestockModal() { document.getElementById('restock-modal').classList.add('hidden'); }
+
+        function saveRestock() {
+            const index = Number(document.getElementById('restock-prod-index').value);
+            const qty = Number(document.getElementById('restock-qty').value);
+            const supplier = document.getElementById('restock-supplier').value;
+
+            if (isNaN(qty) || qty <= 0) return alert('Weka idadi sahihi!');
+
+            products[index].stock += qty;
+            localStorage.setItem('nma_products', JSON.stringify(products));
+
+            stockLogs.push({
+                date: new Date().toLocaleString('sw-TZ'),
+                productName: products[index].name,
+                branch: products[index].branch,
+                qtyAdded: qty,
+                supplier: supplier,
+                addedBy: currentUser ? currentUser.name : 'Unknown'
+            });
+            localStorage.setItem('nma_stock_logs', JSON.stringify(stockLogs));
+
+            document.getElementById('restock-qty').value = '';
+            closeRestockModal();
+            renderAll();
+            alert('Stoo imeongezwa kwa mafanikio!');
         }
 
         function renderStockLogs() {
@@ -1093,6 +1210,36 @@
             `).join('');
         }
 
+        function openCustomerModal() { document.getElementById('customer-modal').classList.remove('hidden'); }
+        function closeCustomerModal() { document.getElementById('customer-modal').classList.add('hidden'); }
+
+        function saveCustomer() {
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+
+            if (!name) return alert('Weka jina la mteja!');
+
+            customers.push({ name, phone, address, debt: 0 });
+            localStorage.setItem('nma_customers', JSON.stringify(customers));
+
+            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-phone').value = '';
+            document.getElementById('cust-address').value = '';
+
+            closeCustomerModal();
+            renderAll();
+            alert('Mteja ameongezwa!');
+        }
+
+        function deleteCustomer(index) {
+            if (confirm('Je, una uhakika unataka kufuta mteja huyu?')) {
+                customers.splice(index, 1);
+                localStorage.setItem('nma_customers', JSON.stringify(customers));
+                renderAll();
+            }
+        }
+
         function renderSuppliers() {
             const tbody = document.getElementById('suppliers-table-body');
             tbody.innerHTML = suppliers.map((s, index) => `
@@ -1105,6 +1252,36 @@
                     </td>
                 </tr>
             `).join('');
+        }
+
+        function openSupplierModal() { document.getElementById('supplier-modal').classList.remove('hidden'); }
+        function closeSupplierModal() { document.getElementById('supplier-modal').classList.add('hidden'); }
+
+        function saveSupplier() {
+            const name = document.getElementById('supp-name').value.trim();
+            const phone = document.getElementById('supp-phone').value.trim();
+            const items = document.getElementById('supp-items').value.trim();
+
+            if (!name) return alert('Weka jina la msambazaji!');
+
+            suppliers.push({ name, phone, items });
+            localStorage.setItem('nma_suppliers', JSON.stringify(suppliers));
+
+            document.getElementById('supp-name').value = '';
+            document.getElementById('supp-phone').value = '';
+            document.getElementById('supp-items').value = '';
+
+            closeSupplierModal();
+            renderAll();
+            alert('Msambazaji ameongezwa!');
+        }
+
+        function deleteSupplier(index) {
+            if (confirm('Je, una uhakika unataka kufuta msambazaji huyu?')) {
+                suppliers.splice(index, 1);
+                localStorage.setItem('nma_suppliers', JSON.stringify(suppliers));
+                renderAll();
+            }
         }
 
         function renderPosGrid() {
@@ -1255,24 +1432,183 @@
             localStorage.setItem('nma_products', JSON.stringify(products));
             localStorage.setItem('nma_sales', JSON.stringify(salesHistory));
 
-            triggerReceiptPrint(saleRecord);
+            printReceipt(saleRecord);
+
             cart = [];
             renderCart();
             renderAll();
         }
 
-        function triggerReceiptPrint(sale) {
-            document.getElementById('receipt-branch-name').innerText = `TAWI: ${sale.branch}`;
+        function printReceipt(sale) {
+            document.getElementById('receipt-branch-name').innerText = sale.branch;
             document.getElementById('receipt-date').innerText = sale.date;
             document.getElementById('receipt-customer').innerText = `Mteja: ${sale.customer}`;
-            document.getElementById('receipt-cashier').innerText = `Mhudumu: ${sale.cashierName || 'Cashier'}`;
-            document.getElementById('receipt-type').innerText = `Aina: ${sale.paymentType === 'Credit' ? 'MKOPO' : 'CASH'}`;
-            
+            document.getElementById('receipt-cashier').innerText = `Mhudumu: ${sale.cashierName}`;
+            document.getElementById('receipt-type').innerText = `Aina ya Malipo: ${sale.paymentType}`;
+
             const tbody = document.getElementById('receipt-items-body');
-            tbody.innerHTML = sale.items.map(i => `<tr><td>${escapeHTML(i.name)}</td><td>${i.qty}</td><td>${i.price * i.qty}</td></tr>`).join('');
+            tbody.innerHTML = sale.items.map(i => `
+                <tr>
+                    <td>${escapeHTML(i.name)}</td>
+                    <td>${i.qty}</td>
+                    <td>TSH ${i.price * i.qty}</td>
+                </tr>
+            `).join('');
 
             document.getElementById('receipt-total').innerText = `TSH ${sale.total}`;
+
             window.print();
+        }
+
+        function renderDashboard() {
+            const displayProducts = getScopedProducts();
+            const displaySales = getScopedSales();
+
+            const scopeText = currentUser?.role === 'supervisor' ? 
+                `Inaonyesha data za: ${document.getElementById('dash-branch-filter')?.value || 'Matawi Yote'}` : 
+                `Tawi: ${currentUser?.branch}`;
+            document.getElementById('dashboard-scope-text').innerText = scopeText;
+
+            const today = new Date().toLocaleDateString('sw-TZ');
+            const todaySales = displaySales
+                .filter(s => new Date(s.timestamp).toLocaleDateString('sw-TZ') === today)
+                .reduce((sum, s) => sum + s.total, 0);
+
+            document.getElementById('dash-today-sales').innerText = `TSH ${todaySales}`;
+            document.getElementById('dash-total-products').innerText = displayProducts.length;
+
+            const lowStockList = displayProducts.filter(p => p.stock <= MIN_STOCK_ALERT);
+            document.getElementById('dash-low-stock-count').innerText = lowStockList.length;
+
+            const totalDebt = customers.reduce((sum, c) => sum + (Number(c.debt) || 0), 0);
+            document.getElementById('dash-total-debt').innerText = `TSH ${totalDebt}`;
+
+            const lowStockContainer = document.getElementById('low-stock-list');
+            if (lowStockList.length === 0) {
+                lowStockContainer.innerHTML = `<p class="text-sm text-amber-700">Hakuna bidhaa zenye stoo ndogo.</p>`;
+            } else {
+                lowStockContainer.innerHTML = lowStockList.map(p => `
+                    <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-amber-200">
+                        <div>
+                            <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">${escapeHTML(p.branch)}</span>
+                            <span class="font-bold text-gray-800 ml-1">${escapeHTML(p.name)}</span>
+                        </div>
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-1 rounded-full">Stoo Imebaki: ${p.stock}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderSalesHistory() {
+            const historyContainer = document.getElementById('sales-history');
+            const displaySales = getScopedSales();
+
+            const now = new Date();
+            let filteredSales = displaySales;
+
+            if (currentReportFilter === 'day') {
+                const today = now.toLocaleDateString('sw-TZ');
+                filteredSales = displaySales.filter(s => new Date(s.timestamp).toLocaleDateString('sw-TZ') === today);
+            } else if (currentReportFilter === 'week') {
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - now.getDay());
+                filteredSales = displaySales.filter(s => s.timestamp >= startOfWeek.getTime());
+            } else if (currentReportFilter === 'month') {
+                filteredSales = displaySales.filter(s => {
+                    const d = new Date(s.timestamp);
+                    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                });
+            }
+
+            const totalAmount = filteredSales.reduce((sum, s) => sum + s.total, 0);
+            const totalCount = filteredSales.length;
+            const avgSale = totalCount > 0 ? Math.round(totalAmount / totalCount) : 0;
+
+            document.getElementById('report-total-amount').innerText = `TSH ${totalAmount}`;
+            document.getElementById('report-total-count').innerText = totalCount;
+            document.getElementById('report-avg-sale').innerText = `TSH ${avgSale}`;
+
+            if (filteredSales.length === 0) {
+                historyContainer.innerHTML = `<p class="text-gray-400 text-center py-6">Hakuna mauzo katika kipindi hiki.</p>`;
+                return;
+            }
+
+            historyContainer.innerHTML = [...filteredSales].reverse().map(s => `
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50 p-4 rounded-xl border border-gray-200 gap-2">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">${escapeHTML(s.branch)}</span>
+                            <span class="font-bold text-gray-800">${escapeHTML(s.customer)}</span>
+                            <span class="text-xs px-2 py-0.5 rounded ${s.paymentType === 'Credit' ? 'bg-amber-100 text-amber-800 font-bold' : 'bg-emerald-100 text-emerald-800'}">${escapeHTML(s.paymentType)}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">${s.date} • Cashier: ${escapeHTML(s.cashierName)}</p>
+                    </div>
+                    <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                        <span class="font-extrabold text-emerald-600 text-lg">TSH ${s.total}</span>
+                        <button onclick="reprintReceipt(${s.id})" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded text-xs font-semibold transition">
+                            <i class="fa-solid fa-print mr-1"></i> Risiti
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCashierShift() {
+            const shiftContainer = document.getElementById('cashier-shift-sales-list');
+            if (!shiftContainer || !currentUser) return;
+
+            const today = new Date().toLocaleDateString('sw-TZ');
+            const cashierSales = salesHistory.filter(s => 
+                s.cashierName === currentUser.name && 
+                new Date(s.timestamp).toLocaleDateString('sw-TZ') === today
+            );
+
+            const cashCollected = cashierSales.filter(s => s.paymentType === 'Cash').reduce((sum, s) => sum + s.total, 0);
+            const creditCollected = cashierSales.filter(s => s.paymentType === 'Credit').reduce((sum, s) => sum + s.total, 0);
+
+            document.getElementById('shift-cash-collected').innerText = `TSH ${cashCollected}`;
+            document.getElementById('shift-credit-collected').innerText = `TSH ${creditCollected}`;
+            document.getElementById('shift-total-count').innerText = cashierSales.length;
+
+            if (cashierSales.length === 0) {
+                shiftContainer.innerHTML = `<p class="text-gray-400 text-center py-6">Hujafanya mauzo yoyote kwenye zamu ya leo.</p>`;
+                return;
+            }
+
+            shiftContainer.innerHTML = [...cashierSales].reverse().map(s => `
+                <div class="flex justify-between items-center bg-gray-50 p-3.5 rounded-xl border border-gray-200">
+                    <div>
+                        <span class="font-bold text-gray-800">${escapeHTML(s.customer)}</span>
+                        <span class="text-xs px-2 py-0.5 ml-2 rounded ${s.paymentType === 'Credit' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${escapeHTML(s.paymentType)}</span>
+                        <p class="text-xs text-gray-400 mt-0.5">${s.date}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-emerald-600">TSH ${s.total}</span>
+                        <button onclick="reprintReceipt(${s.id})" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-2.5 py-1 rounded text-xs font-bold transition">
+                            <i class="fa-solid fa-print mr-1"></i> Chapa
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setReportFilter(filter) {
+            currentReportFilter = filter;
+            document.querySelectorAll('#section-reports button').forEach(b => {
+                b.classList.remove('bg-white', 'text-blue-600', 'shadow');
+                b.classList.add('text-gray-600');
+            });
+            const activeBtn = document.getElementById(`btn-report-${filter}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-white', 'text-blue-600', 'shadow');
+                activeBtn.classList.remove('text-gray-600');
+            }
+            renderSalesHistory();
+        }
+
+        function reprintReceipt(saleId) {
+            const sale = salesHistory.find(s => s.id === saleId);
+            if (sale) printReceipt(sale);
         }
 
         function handleHardwareScan(barcode) {
@@ -1288,12 +1624,12 @@
                 html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
                 html5QrcodeScanner.render((decodedText) => {
                     addToCart(decodedText);
-                    if (html5QrcodeScanner) html5QrcodeScanner.clear();
                     container.classList.add('hidden');
+                    html5QrcodeScanner.clear();
                 });
             } else {
-                if (html5QrcodeScanner) html5QrcodeScanner.clear();
                 container.classList.add('hidden');
+                if (html5QrcodeScanner) html5QrcodeScanner.clear();
             }
         }
 
@@ -1301,305 +1637,17 @@
             const container = document.getElementById('modal-reader-container');
             if (container.classList.contains('hidden')) {
                 container.classList.remove('hidden');
-                modalQrcodeScanner = new Html5QrcodeScanner("modal-reader", { fps: 10, qrbox: 200 });
+                modalQrcodeScanner = new Html5QrcodeScanner("modal-reader", { fps: 10, qrbox: 250 });
                 modalQrcodeScanner.render((decodedText) => {
                     document.getElementById('prod-barcode').value = decodedText;
-                    if (modalQrcodeScanner) modalQrcodeScanner.clear();
                     container.classList.add('hidden');
+                    modalQrcodeScanner.clear();
                 });
             } else {
-                if (modalQrcodeScanner) modalQrcodeScanner.clear();
                 container.classList.add('hidden');
+                if (modalQrcodeScanner) modalQrcodeScanner.clear();
             }
         }
-
-        function renderDashboard() {
-            const scopedProducts = getScopedProducts();
-            const scopedSales = getScopedSales();
-
-            const currentFilter = currentUser?.role === 'supervisor' ? (document.getElementById('dash-branch-filter')?.value || 'ALL') : currentUser?.branch;
-            const scopeText = document.getElementById('dashboard-scope-text');
-            if (scopeText) scopeText.innerText = `Unatazama data za tawi la: ${currentFilter === 'ALL' ? 'Matawi Yote (Supervisor)' : currentFilter}`;
-
-            document.getElementById('dash-total-products').innerText = scopedProducts.length;
-            
-            const totalDebt = customers.reduce((sum, c) => sum + Number(c.debt || 0), 0);
-            document.getElementById('dash-total-debt').innerText = `TSH ${totalDebt}`;
-
-            const startOfDay = new Date();
-            startOfDay.setHours(0,0,0,0);
-            const todayTotal = scopedSales.filter(s => (s.timestamp || 0) >= startOfDay.getTime()).reduce((sum, s) => sum + s.total, 0);
-            document.getElementById('dash-today-sales').innerText = `TSH ${todayTotal}`;
-
-            const lowStockItems = scopedProducts.filter(p => p.stock <= MIN_STOCK_ALERT);
-            document.getElementById('dash-low-stock-count').innerText = lowStockItems.length;
-
-            const lowStockContainer = document.getElementById('low-stock-list');
-            if (lowStockItems.length === 0) {
-                lowStockContainer.innerHTML = `<p class="text-sm text-emerald-700 font-semibold">Bidhaa zote zina stoo ya kutosha!</p>`;
-            } else {
-                lowStockContainer.innerHTML = lowStockItems.map(item => `
-                    <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-amber-200">
-                        <span class="font-bold text-gray-800">${escapeHTML(item.name)} (${escapeHTML(item.branch)})</span>
-                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full font-extrabold text-xs">Zimebaki: ${item.stock}</span>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function renderCashierShift() {
-            if (!currentUser) return;
-            const startOfDay = new Date();
-            startOfDay.setHours(0,0,0,0);
-
-            // Pata mauzo ya cashier huyu pekee ya siku ya leo
-            const mySalesToday = salesHistory.filter(s => 
-                s.cashierName === currentUser.name && 
-                s.branch === currentUser.branch &&
-                (s.timestamp || 0) >= startOfDay.getTime()
-            );
-
-            const cashTotal = mySalesToday.filter(s => s.paymentType === 'Cash').reduce((sum, s) => sum + s.total, 0);
-            const creditTotal = mySalesToday.filter(s => s.paymentType === 'Credit').reduce((sum, s) => sum + s.total, 0);
-
-            document.getElementById('shift-cash-collected').innerText = `TSH ${cashTotal}`;
-            document.getElementById('shift-credit-collected').innerText = `TSH ${creditTotal}`;
-            document.getElementById('shift-total-count').innerText = mySalesToday.length;
-
-            const container = document.getElementById('cashier-shift-sales-list');
-            if (mySalesToday.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm">Hujafanya mauzo yoyote kwenye zamu yako ya leo.</p>`;
-                return;
-            }
-
-            container.innerHTML = [...mySalesToday].reverse().map(s => `
-                <div class="p-4 border rounded-xl flex justify-between items-center bg-gray-50">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <p class="font-bold text-gray-800">${escapeHTML(s.customer)}</p>
-                            <span class="px-2 py-0.5 text-xs font-semibold rounded ${s.paymentType === 'Credit' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${escapeHTML(s.paymentType)}</span>
-                        </div>
-                        <p class="text-xs text-gray-500">${escapeHTML(s.date)}</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-bold text-emerald-600 text-lg">TSH ${s.total}</span>
-                        <button onclick="reprintReceipt(${s.id})" class="bg-blue-50 text-blue-600 hover:bg-blue-100 p-2 rounded-lg text-xs font-bold transition">
-                            <i class="fa-solid fa-print"></i> Print
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function reprintReceipt(saleId) {
-            const sale = salesHistory.find(s => s.id === saleId);
-            if (sale) {
-                triggerReceiptPrint(sale);
-            }
-        }
-
-        function setReportFilter(type) {
-            currentReportFilter = type;
-            const btnDay = document.getElementById('btn-report-day');
-            const btnWeek = document.getElementById('btn-report-week');
-            const btnMonth = document.getElementById('btn-report-month');
-            const activeClasses = 'bg-white text-blue-600 shadow';
-            const inactiveClasses = 'text-gray-600 hover:text-gray-900';
-
-            btnDay.className = `px-4 py-1.5 text-xs font-bold rounded-md transition ${type === 'day' ? activeClasses : inactiveClasses}`;
-            btnWeek.className = `px-4 py-1.5 text-xs font-bold rounded-md transition ${type === 'week' ? activeClasses : inactiveClasses}`;
-            btnMonth.className = `px-4 py-1.5 text-xs font-bold rounded-md transition ${type === 'month' ? activeClasses : inactiveClasses}`;
-
-            renderSalesHistory();
-        }
-
-        function renderSalesHistory() {
-            const container = document.getElementById('sales-history');
-            const now = new Date();
-            let startTime = 0;
-
-            if (currentReportFilter === 'day') {
-                const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                startTime = dayStart.getTime();
-            } else if (currentReportFilter === 'week') {
-                const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
-                weekStart.setHours(0,0,0,0);
-                startTime = weekStart.getTime();
-            } else if (currentReportFilter === 'month') {
-                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-                startTime = monthStart.getTime();
-            }
-
-            const scopedSales = getScopedSales();
-            const filteredSales = scopedSales.filter(s => (s.timestamp || 0) >= startTime);
-            const totalAmount = filteredSales.reduce((sum, s) => sum + s.total, 0);
-            const totalCount = filteredSales.length;
-            const avgSale = totalCount > 0 ? Math.round(totalAmount / totalCount) : 0;
-
-            document.getElementById('report-total-amount').innerText = `TSH ${totalAmount}`;
-            document.getElementById('report-total-count').innerText = totalCount;
-            document.getElementById('report-avg-sale').innerText = `TSH ${avgSale}`;
-
-            if (filteredSales.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm">Hakuna kumbukumbu za mauzo.</p>`;
-                return;
-            }
-
-            container.innerHTML = [...filteredSales].reverse().map(s => `
-                <div class="p-4 border rounded-xl flex justify-between items-center bg-gray-50">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <p class="font-bold text-gray-800">${escapeHTML(s.customer)}</p>
-                            <span class="px-2 py-0.5 text-xs font-semibold rounded ${s.paymentType === 'Credit' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${escapeHTML(s.paymentType)}</span>
-                            <span class="px-2 py-0.5 text-xs font-bold bg-blue-100 text-blue-800 rounded">${escapeHTML(s.branch)}</span>
-                        </div>
-                        <p class="text-xs text-gray-500">${escapeHTML(s.date)} | Cashier: ${escapeHTML(s.cashierName || 'N/A')}</p>
-                    </div>
-                    <span class="font-bold text-emerald-600 text-lg">TSH ${s.total}</span>
-                </div>
-            `).join('');
-        }
-
-        function openProductModal() { document.getElementById('product-modal').classList.remove('hidden'); }
-        function closeProductModal() { 
-            if (modalQrcodeScanner) modalQrcodeScanner.clear();
-            document.getElementById('modal-reader-container').classList.add('hidden');
-            document.getElementById('product-modal').classList.add('hidden'); 
-        }
-
-        function saveProduct() {
-            const branch = document.getElementById('prod-branch-select').value;
-            const barcodeVal = document.getElementById('prod-barcode').value.trim() || ('SKU-' + Date.now().toString().slice(-5));
-            const name = document.getElementById('prod-name').value.trim();
-            const cost = Number(document.getElementById('prod-cost').value) || 0;
-            const price = Number(document.getElementById('prod-price').value) || 0;
-            const stock = Number(document.getElementById('prod-stock').value) || 0;
-            const supplier = document.getElementById('prod-supplier').value;
-
-            if (!name) return alert('Weka jina la bidhaa!');
-
-            products.push({ barcode: barcodeVal, name, branch, cost, price, stock });
-            stockLogs.push({
-                date: new Date().toLocaleString('sw-TZ'),
-                productName: name,
-                branch: branch,
-                qtyAdded: stock,
-                supplier: supplier,
-                addedBy: currentUser ? currentUser.name : 'Admin'
-            });
-
-            localStorage.setItem('nma_products', JSON.stringify(products));
-            localStorage.setItem('nma_stock_logs', JSON.stringify(stockLogs));
-            
-            document.getElementById('prod-barcode').value = '';
-            document.getElementById('prod-name').value = '';
-            document.getElementById('prod-cost').value = '';
-            document.getElementById('prod-price').value = '';
-            document.getElementById('prod-stock').value = '';
-
-            closeProductModal();
-            renderAll();
-        }
-
-        function openRestockModal(index) {
-            const p = products[index];
-            document.getElementById('restock-prod-index').value = index;
-            document.getElementById('restock-prod-name').innerText = `Bidhaa: ${p.name} (${p.branch} - Stoo: ${p.stock})`;
-            document.getElementById('restock-modal').classList.remove('hidden');
-        }
-        function closeRestockModal() { document.getElementById('restock-modal').classList.add('hidden'); }
-
-        function saveRestock() {
-            const index = document.getElementById('restock-prod-index').value;
-            const qtyAdded = Number(document.getElementById('restock-qty').value) || 0;
-            const supplier = document.getElementById('restock-supplier').value;
-
-            if (qtyAdded <= 0) return alert('Weka idadi halali!');
-
-            products[index].stock += qtyAdded;
-            stockLogs.push({
-                date: new Date().toLocaleString('sw-TZ'),
-                productName: products[index].name,
-                branch: products[index].branch,
-                qtyAdded: qtyAdded,
-                supplier: supplier,
-                addedBy: currentUser ? currentUser.name : 'Admin'
-            });
-
-            localStorage.setItem('nma_products', JSON.stringify(products));
-            localStorage.setItem('nma_stock_logs', JSON.stringify(stockLogs));
-            
-            document.getElementById('restock-qty').value = '';
-            closeRestockModal();
-            renderAll();
-        }
-
-        function openCustomerModal() { document.getElementById('customer-modal').classList.remove('hidden'); }
-        function closeCustomerModal() { document.getElementById('customer-modal').classList.add('hidden'); }
-        function saveCustomer() {
-            const name = document.getElementById('cust-name').value.trim();
-            const phone = document.getElementById('cust-phone').value.trim();
-            const address = document.getElementById('cust-address').value.trim();
-
-            if (!name) return alert('Weka jina la mteja!');
-
-            customers.push({ name, phone, address, debt: 0 });
-            localStorage.setItem('nma_customers', JSON.stringify(customers));
-
-            document.getElementById('cust-name').value = '';
-            document.getElementById('cust-phone').value = '';
-            document.getElementById('cust-address').value = '';
-
-            closeCustomerModal();
-            renderAll();
-        }
-
-        function openSupplierModal() { document.getElementById('supplier-modal').classList.remove('hidden'); }
-        function closeSupplierModal() { document.getElementById('supplier-modal').classList.add('hidden'); }
-        function saveSupplier() {
-            const name = document.getElementById('supp-name').value.trim();
-            const phone = document.getElementById('supp-phone').value.trim();
-            const items = document.getElementById('supp-items').value.trim();
-
-            if (!name) return alert('Weka jina la msambazaji!');
-
-            suppliers.push({ name, phone, items });
-            localStorage.setItem('nma_suppliers', JSON.stringify(suppliers));
-
-            document.getElementById('supp-name').value = '';
-            document.getElementById('supp-phone').value = '';
-            document.getElementById('supp-items').value = '';
-
-            closeSupplierModal();
-            renderAll();
-        }
-
-        function openUserModal() { document.getElementById('user-modal').classList.remove('hidden'); }
-        function closeUserModal() { document.getElementById('user-modal').classList.add('hidden'); }
-        function saveUser() {
-            const name = document.getElementById('new-user-name').value.trim();
-            const role = document.getElementById('new-user-role').value;
-            const branch = document.getElementById('new-user-branch').value;
-            const pass = document.getElementById('new-user-pass').value.trim();
-
-            if (!name || !pass) return alert('Jaza jina na password!');
-
-            users.push({ name, role, branch, pass });
-            localStorage.setItem('nma_users', JSON.stringify(users));
-
-            document.getElementById('new-user-name').value = '';
-            document.getElementById('new-user-pass').value = '';
-
-            closeUserModal();
-            renderUsers();
-            populateLoginBranches();
-            alert(`Mtumiaji ${name} ameongezwa kwa mafanikio!`);
-        }
-
-        function deleteProduct(i) { products.splice(i, 1); localStorage.setItem('nma_products', JSON.stringify(products)); renderAll(); }
-        function deleteCustomer(i) { customers.splice(i, 1); localStorage.setItem('nma_customers', JSON.stringify(customers)); renderAll(); }
-        function deleteSupplier(i) { suppliers.splice(i, 1); localStorage.setItem('nma_suppliers', JSON.stringify(suppliers)); renderAll(); }
-        function deleteUser(i) { users.splice(i, 1); localStorage.setItem('nma_users', JSON.stringify(users)); renderUsers(); populateLoginBranches(); }
     </script>
 </body>
 </html>
