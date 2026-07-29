@@ -697,7 +697,7 @@
         let currentUser = null;
         
         let users = JSON.parse(localStorage.getItem('nma_users')) || [
-            { name: 'Boss Admin', role: 'supervisor', branch: 'ALL', pass: 'admin123' },
+            { name: 'Boss Admin', role: 'supervisor', branch: 'ALL', pass: '45678' },
             { name: 'Admin Kariakoo', role: 'admin', branch: 'Tawi la Kariakoo', pass: '1234' },
             { name: 'Mhudumu Mwenge', role: 'cashier', branch: 'Tawi la Mwenge', pass: '1234' }
         ];
@@ -752,10 +752,8 @@
             const userSelect = document.getElementById('login-user-select');
 
             if (selectedBranch === 'SUPERVISOR') {
-                // Ficha uwanja wa mtumiaji ukiwa Supervisor
                 userContainer.classList.add('hidden');
             } else {
-                // Onyesha uwanja wa mtumiaji ukiwa tawi lingine (Admin / Cashier)
                 userContainer.classList.remove('hidden');
                 let filteredUsers = users.filter(u => u.branch === selectedBranch && u.role !== 'supervisor');
 
@@ -785,7 +783,6 @@
             let foundUser = null;
 
             if (selectedBranch === 'SUPERVISOR') {
-                // Ukichagua Supervisor, kagua password ya supervisor yeyote anayelingana
                 foundUser = users.find(u => u.role === 'supervisor' && u.pass === pass);
             } else {
                 const username = document.getElementById('login-user-select').value;
