@@ -97,7 +97,6 @@
         <!-- MOBILE HEADER BAR -->
         <header class="md:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center no-print">
             <div class="flex items-center">
-                <!-- LOGO ON MOBILE HEADER -->
                 <div class="brand-logo-text text-xl">
                     <span class="nma">N<span class="m-red">M</span>A</span>
                     <span class="percent">100%</span>
@@ -113,7 +112,6 @@
             <div>
                 <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200">
                     <div class="flex items-center">
-                        <!-- LOGO ON DESKTOP SIDEBAR -->
                         <div class="brand-logo-text text-2xl tracking-wide">
                             <span class="nma">N<span class="m-red">M</span>A</span>
                             <span class="percent">100%</span>
@@ -132,7 +130,7 @@
                         <p id="current-user-display" class="text-sm font-bold text-gray-800">Admin</p>
                         <p id="current-user-branch" class="text-xs text-blue-600 font-bold">Tawi Kuu</p>
                     </div>
-                    <span id="role-badge" class="px-2 py-0.5 text-[10px] font-semibold bg-blue-100 text-blue-800 rounded-full">ADMIN</span>
+                    <span id="role-badge" class="px-2 py-0.5 text-[10px] font-semibold bg-blue-100 text-blue-800 rounded-full">SUPERVISOR</span>
                 </div>
 
                 <nav class="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-250px)]">
@@ -140,7 +138,8 @@
                         <i class="fa-solid fa-chart-pie w-6 text-gray-500"></i>
                         <span>Dashboard</span>
                     </button>
-                    <button onclick="switchTab('branches')" id="nav-branches" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <!-- Tawi Linaonekana kwa Supervisor Tu -->
+                    <button onclick="switchTab('branches')" id="nav-branches" class="nav-btn supervisor-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-code-branch w-6 text-gray-500"></i>
                         <span>Matawi (Branches)</span>
                     </button>
@@ -168,7 +167,7 @@
                         <i class="fa-solid fa-file-invoice-dollar w-6 text-gray-500"></i>
                         <span>Ripoti za Mauzo</span>
                     </button>
-                    <button onclick="switchTab('users')" id="nav-users" class="nav-btn w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
+                    <button onclick="switchTab('users')" id="nav-users" class="nav-btn supervisor-only w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl text-left transition">
                         <i class="fa-solid fa-user-gear w-6 text-gray-500"></i>
                         <span>Watumiaji & Passwords</span>
                     </button>
@@ -193,10 +192,11 @@
                         <p id="dashboard-scope-text" class="text-xs text-blue-600 font-semibold mt-1"></p>
                     </div>
 
-                    <div class="flex items-center gap-2 bg-white p-2 border rounded-xl shadow-sm">
-                        <label class="text-xs font-bold text-gray-600"><i class="fa-solid fa-filter mr-1"></i>Chuja Tawi:</label>
+                    <!-- Filter ya matawi inaonekana tu kama Supervisor ameingia -->
+                    <div id="dash-branch-filter-container" class="supervisor-only flex items-center gap-2 bg-white p-2 border rounded-xl shadow-sm">
+                        <label class="text-xs font-bold text-gray-600"><i class="fa-solid fa-filter mr-1"></i>Tawi:</label>
                         <select id="dash-branch-filter" onchange="renderAll()" class="text-sm font-semibold bg-gray-50 p-1.5 border rounded-lg focus:outline-none">
-                            <option value="ALL">Matawi Yote (All Branches)</option>
+                            <option value="ALL">Matawi Yote (Supervisor)</option>
                         </select>
                     </div>
                 </div>
@@ -234,10 +234,10 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800">Usimamizi wa Matawi (Branches)</h2>
-                        <p class="text-xs text-gray-500">Ongeza Matawi na kuteua ma-Admin pamoja na Cashier hapo hapo.</p>
+                        <p class="text-xs text-gray-500">Ongeza Matawi na kuteua Admin au Cashier kwa kila tawi.</p>
                     </div>
                     <button onclick="openBranchModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition">
-                        <i class="fa-solid fa-plus mr-1"></i> Ongeza Tawi & Admin Jipya
+                        <i class="fa-solid fa-plus mr-1"></i> Ongeza Tawi Jipya
                     </button>
                 </div>
 
@@ -459,7 +459,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800">Usimamizi wa Watumiaji</h2>
-                        <p class="text-xs text-gray-500">Orodha ya ma-Admin na Cashiers wote kwa kila tawi.</p>
+                        <p class="text-xs text-gray-500">Orodha ya ma-Supervisor, Admin wa Tawi na Cashier.</p>
                     </div>
                     <button onclick="openUserModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition">
                         <i class="fa-solid fa-user-plus mr-1"></i> Ongeza Mtumiaji Mpya
@@ -489,7 +489,6 @@
     <!-- PRINTABLE RECEIPT TEMPLATE -->
     <div id="printable-receipt" class="p-6 max-w-sm mx-auto font-mono text-sm">
         <div class="text-center border-b pb-3 mb-3">
-            <!-- LOGO ON RECEIPT -->
             <div class="brand-logo-text text-xl mb-1">
                 <span class="nma">N<span class="m-red">M</span>A</span>
                 <span class="percent">100%</span>
@@ -637,7 +636,7 @@
                 <select id="new-user-role" class="w-full p-2 border rounded-lg">
                     <option value="cashier">Mhudumu (Cashier)</option>
                     <option value="admin">Admin wa Tawi (Branch Admin)</option>
-                    <option value="superadmin">Super Admin (Mkuu)</option>
+                    <option value="supervisor">Supervisor (Mkuu wa Matawi Yote)</option>
                 </select>
             </div>
             <div>
@@ -665,7 +664,7 @@
         let currentUser = null;
         
         let users = JSON.parse(localStorage.getItem('nma_users')) || [
-            { name: 'Boss Admin', role: 'superadmin', branch: 'ALL', pass: 'admin123' },
+            { name: 'Boss Admin', role: 'supervisor', branch: 'ALL', pass: 'admin123' },
             { name: 'Admin Kariakoo', role: 'admin', branch: 'Tawi la Kariakoo', pass: '1234' },
             { name: 'Mhudumu Mwenge', role: 'cashier', branch: 'Tawi la Mwenge', pass: '1234' }
         ];
@@ -707,7 +706,9 @@
         function populateLoginBranches() {
             const branchSelect = document.getElementById('login-branch-select');
             if (!branchSelect) return;
-            branchSelect.innerHTML = `<option value="ALL">--- Matawi Yote / Super Admin ---</option>` +
+            
+            // Orodha ya login kulingana na Matawi
+            branchSelect.innerHTML = `<option value="SUPERVISOR">--- SUPERVISOR (Matawi Yote) ---</option>` +
                 branches.map(b => `<option value="${escapeHTML(b.name)}">${escapeHTML(b.name)}</option>`).join('');
             
             onLoginBranchChange();
@@ -718,11 +719,17 @@
             const userSelect = document.getElementById('login-user-select');
 
             let filteredUsers = users;
-            if (selectedBranch !== 'ALL') {
-                filteredUsers = users.filter(u => u.branch === selectedBranch || u.role === 'superadmin');
+            if (selectedBranch === 'SUPERVISOR') {
+                filteredUsers = users.filter(u => u.role === 'supervisor');
+            } else {
+                filteredUsers = users.filter(u => u.branch === selectedBranch && u.role !== 'supervisor');
             }
 
-            userSelect.innerHTML = filteredUsers.map(u => `<option value="${escapeHTML(u.name)}">${escapeHTML(u.name)} (${escapeHTML(u.role.toUpperCase())})</option>`).join('');
+            if(filteredUsers.length === 0) {
+                userSelect.innerHTML = `<option value="">Hakuna Mtumiaji Tawi Hili</option>`;
+            } else {
+                userSelect.innerHTML = filteredUsers.map(u => `<option value="${escapeHTML(u.name)}">${escapeHTML(u.name)} (${escapeHTML(u.role.toUpperCase())})</option>`).join('');
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -740,6 +747,8 @@
             const pass = document.getElementById('login-password').value;
             const rememberMe = document.getElementById('remember-me').checked;
 
+            if(!username) return alert('Chagua mtumiaji!');
+
             const foundUser = users.find(u => u.name === username && u.pass === pass);
 
             if (foundUser) {
@@ -756,8 +765,16 @@
             currentUser = user;
             document.getElementById('login-overlay').classList.add('hidden');
             document.getElementById('current-user-display').innerText = user.name;
-            document.getElementById('current-user-branch').innerText = user.branch === 'ALL' ? 'Matawi Yote' : (user.branch || 'Tawi Kuu');
+            document.getElementById('current-user-branch').innerText = user.role === 'supervisor' ? 'Matawi Yote' : (user.branch || 'Tawi Kuu');
             document.getElementById('role-badge').innerText = user.role.toUpperCase();
+
+            // Dhibiti Mwonekano kwa mujibu wa Supervisor vs Admin wa Tawi vs Cashier
+            const supervisorElements = document.querySelectorAll('.supervisor-only');
+            if (user.role === 'supervisor') {
+                supervisorElements.forEach(el => el.classList.remove('hidden'));
+            } else {
+                supervisorElements.forEach(el => el.classList.add('hidden'));
+            }
 
             switchTab('dashboard');
             renderAll();
@@ -870,35 +887,45 @@
             const userBranchSelect = document.getElementById('new-user-branch');
             const filterSelect = document.getElementById('dash-branch-filter');
 
-            const currentVal = filterSelect ? filterSelect.value : 'ALL';
+            // Ikiwa si Supervisor, bidhaa au mtumiaji anapewa tawi lake tu!
+            if (currentUser && currentUser.role !== 'supervisor') {
+                const options = `<option value="${escapeHTML(currentUser.branch)}">${escapeHTML(currentUser.branch)}</option>`;
+                if (prodSelect) prodSelect.innerHTML = options;
+                if (userBranchSelect) userBranchSelect.innerHTML = options;
+                return;
+            }
+
             const options = branches.map(b => `<option value="${escapeHTML(b.name)}">${escapeHTML(b.name)}</option>`).join('');
 
             if (prodSelect) prodSelect.innerHTML = options;
             if (userBranchSelect) {
-                userBranchSelect.innerHTML = `<option value="ALL">Matawi Yote (Super Admin Only)</option>` + options;
+                userBranchSelect.innerHTML = `<option value="ALL">ALL (Supervisor Tu)</option>` + options;
             }
 
             if (filterSelect) {
-                filterSelect.innerHTML = `<option value="ALL">Matawi Yote (All Branches)</option>` + options;
+                const currentVal = filterSelect.value || 'ALL';
+                filterSelect.innerHTML = `<option value="ALL">Matawi Yote (Supervisor)</option>` + options;
                 filterSelect.value = currentVal;
             }
         }
 
         function getScopedProducts() {
             if (!currentUser) return products;
-            if (currentUser.role === 'superadmin') {
+            if (currentUser.role === 'supervisor') {
                 const filter = document.getElementById('dash-branch-filter')?.value || 'ALL';
                 return filter === 'ALL' ? products : products.filter(p => p.branch === filter);
             }
+            // Admin wa Tawi & Cashier wanaona bidhaa za Tawi lao PEKEE
             return products.filter(p => p.branch === currentUser.branch);
         }
 
         function getScopedSales() {
             if (!currentUser) return salesHistory;
-            if (currentUser.role === 'superadmin') {
+            if (currentUser.role === 'supervisor') {
                 const filter = document.getElementById('dash-branch-filter')?.value || 'ALL';
                 return filter === 'ALL' ? salesHistory : salesHistory.filter(s => s.branch === filter);
             }
+            // Admin wa Tawi & Cashier wanaona mauzo ya Tawi lao PEKEE
             return salesHistory.filter(s => s.branch === currentUser.branch);
         }
 
@@ -907,7 +934,7 @@
             tbody.innerHTML = users.map((u, index) => `
                 <tr class="hover:bg-gray-50">
                     <td class="p-4 font-bold text-gray-800">${escapeHTML(u.name)}</td>
-                    <td class="p-4"><span class="px-2 py-1 ${u.role === 'superadmin' ? 'bg-purple-100 text-purple-800' : u.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'} text-xs font-bold rounded">${escapeHTML(u.role.toUpperCase())}</span></td>
+                    <td class="p-4"><span class="px-2 py-1 ${u.role === 'supervisor' ? 'bg-purple-100 text-purple-800' : u.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'} text-xs font-bold rounded">${escapeHTML(u.role.toUpperCase())}</span></td>
                     <td class="p-4 font-semibold text-gray-600">${escapeHTML(u.branch)}</td>
                     <td class="p-4 font-mono text-gray-400">••••••••</td>
                     <td class="p-4 text-center">
@@ -968,9 +995,11 @@
             let logs = stockLogs;
             
             if (currentUser) {
-                const filter = currentUser.role === 'superadmin' ? (document.getElementById('dash-branch-filter')?.value || 'ALL') : currentUser.branch;
-                if (filter !== 'ALL') {
-                    logs = stockLogs.filter(l => l.branch === filter);
+                if (currentUser.role === 'supervisor') {
+                    const filter = document.getElementById('dash-branch-filter')?.value || 'ALL';
+                    if (filter !== 'ALL') logs = stockLogs.filter(l => l.branch === filter);
+                } else {
+                    logs = stockLogs.filter(l => l.branch === currentUser.branch);
                 }
             }
 
@@ -1024,7 +1053,7 @@
             const displayProducts = getScopedProducts();
 
             if (displayProducts.length === 0) {
-                grid.innerHTML = `<p class="text-gray-400 text-xs col-span-3 text-center py-4">Hakuna bidhaa za kuonyesha.</p>`;
+                grid.innerHTML = `<p class="text-gray-400 text-xs col-span-3 text-center py-4">Hakuna bidhaa za kuonyesha kwenye tawi hili.</p>`;
                 return;
             }
 
@@ -1083,7 +1112,7 @@
         function addToCart(barcode) {
             const displayProducts = getScopedProducts();
             const product = displayProducts.find(p => p.barcode === barcode);
-            if (!product || product.stock <= 0) return alert('Bidhaa haipo au imeisha stoo!');
+            if (!product || product.stock <= 0) return alert('Bidhaa haipo au imeisha stoo kwenye tawi hili!');
 
             const existing = cart.find(item => item.barcode === barcode && item.branch === product.branch);
             if (existing) {
@@ -1149,7 +1178,7 @@
                 }
             }
 
-            const activeBranch = currentUser ? (currentUser.branch === 'ALL' ? (cart[0]?.branch || 'Tawi Kuu') : currentUser.branch) : 'Tawi Kuu';
+            const activeBranch = currentUser ? (currentUser.role === 'supervisor' ? (cart[0]?.branch || 'Tawi Kuu') : currentUser.branch) : 'Tawi Kuu';
 
             const saleRecord = {
                 id: Date.now(),
@@ -1227,9 +1256,9 @@
             const scopedProducts = getScopedProducts();
             const scopedSales = getScopedSales();
 
-            const currentFilter = currentUser?.role === 'superadmin' ? document.getElementById('dash-branch-filter')?.value || 'ALL' : currentUser?.branch;
+            const currentFilter = currentUser?.role === 'supervisor' ? (document.getElementById('dash-branch-filter')?.value || 'ALL') : currentUser?.branch;
             const scopeText = document.getElementById('dashboard-scope-text');
-            if (scopeText) scopeText.innerText = `Unatazama data za tawi la: ${currentFilter === 'ALL' ? 'Matawi Yote' : currentFilter}`;
+            if (scopeText) scopeText.innerText = `Unatazama data za tawi la: ${currentFilter === 'ALL' ? 'Matawi Yote (Supervisor)' : currentFilter}`;
 
             document.getElementById('dash-total-products').innerText = scopedProducts.length;
             
