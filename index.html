@@ -20,6 +20,28 @@
             #printable-receipt { position: absolute; left: 0; top: 0; width: 100%; }
             .no-print { display: none !important; }
         }
+
+        /* CUSTOM LOGO STYLES */
+        .brand-logo-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            user-select: none;
+            line-height: 1;
+        }
+        .brand-logo-text .nma {
+            color: #311B92; /* Purple */
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        .brand-logo-text .m-red {
+            color: #FF0000; /* Red */
+        }
+        .brand-logo-text .percent {
+            color: #FF0000; /* Red */
+            font-weight: 800;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans antialiased">
@@ -28,10 +50,14 @@
     <div id="login-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border border-gray-200">
             <div class="text-center mb-6">
-                <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-50 rounded-full mb-3 text-blue-600 overflow-hidden border border-gray-200 shadow-sm">
-                    <img id="app-logo-login" alt="NMA 100% Logo" class="w-full h-full object-contain p-1" onerror="this.style.display='none'">
+                <!-- LOGO ON LOGIN -->
+                <div class="inline-flex items-center justify-center p-4 bg-gray-50 rounded-2xl mb-3 border border-gray-100 shadow-sm">
+                    <div class="brand-logo-text text-3xl">
+                        <span class="nma">N<span class="m-red">M</span>A</span>
+                        <span class="percent">100%</span>
+                    </div>
                 </div>
-                <h1 class="text-3xl font-extrabold text-gray-800">NMA 100%</h1>
+                <h1 class="text-2xl font-extrabold text-gray-800">Karibu NMA 100%</h1>
                 <p class="text-sm text-gray-500 mt-1">Ingia Kwenye Mfumo wa Mauzo na Stoo</p>
             </div>
 
@@ -71,8 +97,11 @@
         <!-- MOBILE HEADER BAR -->
         <header class="md:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center no-print">
             <div class="flex items-center">
-                <img id="app-logo-mobile" alt="NMA Logo" class="h-9 w-auto mr-2 object-contain" onerror="this.style.display='none'">
-                <span class="text-lg font-bold text-gray-800">NMA 100%</span>
+                <!-- LOGO ON MOBILE HEADER -->
+                <div class="brand-logo-text text-xl">
+                    <span class="nma">N<span class="m-red">M</span>A</span>
+                    <span class="percent">100%</span>
+                </div>
             </div>
             <button onclick="toggleMobileSidebar()" class="text-gray-600 hover:text-gray-900 focus:outline-none text-2xl">
                 <i class="fa-solid fa-bars"></i>
@@ -84,8 +113,11 @@
             <div>
                 <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200">
                     <div class="flex items-center">
-                        <img id="app-logo-sidebar" alt="NMA Logo" class="h-10 w-auto mr-3 object-contain" onerror="this.style.display='none'">
-                        <span class="text-xl font-bold text-gray-800 tracking-wide">NMA 100%</span>
+                        <!-- LOGO ON DESKTOP SIDEBAR -->
+                        <div class="brand-logo-text text-2xl tracking-wide">
+                            <span class="nma">N<span class="m-red">M</span>A</span>
+                            <span class="percent">100%</span>
+                        </div>
                     </div>
                 </div>
 
@@ -457,7 +489,11 @@
     <!-- PRINTABLE RECEIPT TEMPLATE -->
     <div id="printable-receipt" class="p-6 max-w-sm mx-auto font-mono text-sm">
         <div class="text-center border-b pb-3 mb-3">
-            <h2 class="text-xl font-bold uppercase">NMA 100%</h2>
+            <!-- LOGO ON RECEIPT -->
+            <div class="brand-logo-text text-xl mb-1">
+                <span class="nma">N<span class="m-red">M</span>A</span>
+                <span class="percent">100%</span>
+            </div>
             <p class="text-xs font-semibold" id="receipt-branch-name"></p>
             <p class="text-xs">Simu: +255 123 456 789</p>
             <p class="text-xs" id="receipt-date"></p>
@@ -644,13 +680,6 @@
         let html5QrcodeScanner = null;
         let modalQrcodeScanner = null;
 
-        function loadLogos() {
-            const logoPath = "logo.png"; 
-            document.getElementById('app-logo-login').src = logoPath;
-            document.getElementById('app-logo-mobile').src = logoPath;
-            document.getElementById('app-logo-sidebar').src = logoPath;
-        }
-
         function updateClock() {
             const now = new Date();
             const dateStr = now.toLocaleDateString('sw-TZ', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -691,7 +720,6 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            loadLogos();
             const savedUser = JSON.parse(localStorage.getItem('nma_active_user'));
             if (savedUser) {
                 loginUserSession(savedUser);
