@@ -702,9 +702,16 @@
         
         let users = JSON.parse(localStorage.getItem('nma_users')) || [
             { name: 'Boss Admin', role: 'supervisor', branch: 'ALL', pass: 'admin123' },
+            { name: 'boss admin', role: 'supervisor', branch: 'ALL', pass: 'admin123' },
             { name: 'Admin Kariakoo', role: 'admin', branch: 'Tawi la Kariakoo', pass: '1234' },
             { name: 'Mhudumu Mwenge', role: 'cashier', branch: 'Tawi la Mwenge', pass: '1234' }
         ];
+
+        // Hakikisha 'boss admin' anakuwepo hata kama localStorage ya zamani imehifadhiwa
+        if (!users.some(u => u.name.toLowerCase() === 'boss admin')) {
+            users.push({ name: 'boss admin', role: 'supervisor', branch: 'ALL', pass: 'admin123' });
+            localStorage.setItem('nma_users', JSON.stringify(users));
+        }
 
         let branches = JSON.parse(localStorage.getItem('nma_branches')) || [
             { name: 'Tawi Kuu (Main)', location: 'Makao Makuu' },
