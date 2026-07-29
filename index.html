@@ -654,6 +654,12 @@
 
     <!-- GLOBAL APPLICATION LOGIC -->
     <script>
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+        }
+
         const MIN_STOCK_ALERT = 3;
 
         let currentUser = null;
@@ -702,7 +708,7 @@
             const branchSelect = document.getElementById('login-branch-select');
             if (!branchSelect) return;
             branchSelect.innerHTML = `<option value="ALL">--- Matawi Yote / Super Admin ---</option>` +
-                branches.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+                branches.map(b => `<option value="${escapeHTML(b.name)}">${escapeHTML(b.name)}</option>`).join('');
             
             onLoginBranchChange();
         }
@@ -716,7 +722,7 @@
                 filteredUsers = users.filter(u => u.branch === selectedBranch || u.role === 'superadmin');
             }
 
-            userSelect.innerHTML = filteredUsers.map(u => `<option value="${u.name}">${u.name} (${u.role.toUpperCase()})</option>`).join('');
+            userSelect.innerHTML = filteredUsers.map(u => `<option value="${escapeHTML(u.name)}">${escapeHTML(u.name)} (${escapeHTML(u.role.toUpperCase())})</option>`).join('');
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -848,9 +854,9 @@
                 const branchAdmin = users.find(u => u.branch === b.name);
                 return `
                     <tr class="hover:bg-gray-50">
-                        <td class="p-4 font-bold text-gray-800">${b.name}</td>
-                        <td class="p-4 text-gray-600">${b.location || 'N/A'}</td>
-                        <td class="p-4"><span class="px-2 py-1 bg-blue-50 text-blue-800 rounded font-bold text-xs">${branchAdmin ? branchAdmin.name : 'Hana Admin'}</span></td>
+                        <td class="p-4 font-bold text-gray-800">${escapeHTML(b.name)}</td>
+                        <td class="p-4 text-gray-600">${escapeHTML(b.location) || 'N/A'}</td>
+                        <td class="p-4"><span class="px-2 py-1 bg-blue-50 text-blue-800 rounded font-bold text-xs">${branchAdmin ? escapeHTML(branchAdmin.name) : 'Hana Admin'}</span></td>
                         <td class="p-4 text-center">
                             <button onclick="deleteBranch(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
                         </td>
@@ -865,7 +871,7 @@
             const filterSelect = document.getElementById('dash-branch-filter');
 
             const currentVal = filterSelect ? filterSelect.value : 'ALL';
-            const options = branches.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+            const options = branches.map(b => `<option value="${escapeHTML(b.name)}">${escapeHTML(b.name)}</option>`).join('');
 
             if (prodSelect) prodSelect.innerHTML = options;
             if (userBranchSelect) {
@@ -900,9 +906,9 @@
             const tbody = document.getElementById('users-table-body');
             tbody.innerHTML = users.map((u, index) => `
                 <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-bold text-gray-800">${u.name}</td>
-                    <td class="p-4"><span class="px-2 py-1 ${u.role === 'superadmin' ? 'bg-purple-100 text-purple-800' : u.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'} text-xs font-bold rounded">${u.role.toUpperCase()}</span></td>
-                    <td class="p-4 font-semibold text-gray-600">${u.branch}</td>
+                    <td class="p-4 font-bold text-gray-800">${escapeHTML(u.name)}</td>
+                    <td class="p-4"><span class="px-2 py-1 ${u.role === 'superadmin' ? 'bg-purple-100 text-purple-800' : u.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'} text-xs font-bold rounded">${escapeHTML(u.role.toUpperCase())}</span></td>
+                    <td class="p-4 font-semibold text-gray-600">${escapeHTML(u.branch)}</td>
                     <td class="p-4 font-mono text-gray-400">••••••••</td>
                     <td class="p-4 text-center">
                         <button onclick="changeUserPassword(${index})" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs font-semibold transition">
@@ -936,9 +942,9 @@
                 const realIndex = products.findIndex(item => item.barcode === p.barcode && item.branch === p.branch);
                 return `
                     <tr class="hover:bg-gray-50 ${isLowStock ? 'bg-red-50' : ''}">
-                        <td class="p-4 font-mono font-semibold text-blue-600">${p.barcode || 'N/A'}</td>
-                        <td class="p-4 font-bold">${p.name}</td>
-                        <td class="p-4"><span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">${p.branch}</span></td>
+                        <td class="p-4 font-mono font-semibold text-blue-600">${escapeHTML(p.barcode) || 'N/A'}</td>
+                        <td class="p-4 font-bold">${escapeHTML(p.name)}</td>
+                        <td class="p-4"><span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">${escapeHTML(p.branch)}</span></td>
                         <td class="p-4">TSH ${p.cost}</td>
                         <td class="p-4 font-bold text-emerald-600">TSH ${p.price}</td>
                         <td class="p-4">
@@ -974,12 +980,12 @@
             }
             tbody.innerHTML = [...logs].reverse().map(log => `
                 <tr class="hover:bg-gray-50 border-b">
-                    <td class="p-4 font-mono text-xs text-gray-500">${log.date}</td>
-                    <td class="p-4 font-bold text-gray-800">${log.productName}</td>
-                    <td class="p-4"><span class="px-2 py-0.5 bg-blue-50 text-blue-800 text-xs rounded">${log.branch}</span></td>
+                    <td class="p-4 font-mono text-xs text-gray-500">${escapeHTML(log.date)}</td>
+                    <td class="p-4 font-bold text-gray-800">${escapeHTML(log.productName)}</td>
+                    <td class="p-4"><span class="px-2 py-0.5 bg-blue-50 text-blue-800 text-xs rounded">${escapeHTML(log.branch)}</span></td>
                     <td class="p-4"><span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold">+${log.qtyAdded}</span></td>
-                    <td class="p-4 text-gray-600">${log.supplier}</td>
-                    <td class="p-4 text-xs">${log.addedBy}</td>
+                    <td class="p-4 text-gray-600">${escapeHTML(log.supplier)}</td>
+                    <td class="p-4 text-xs">${escapeHTML(log.addedBy)}</td>
                 </tr>
             `).join('');
         }
@@ -988,9 +994,9 @@
             const tbody = document.getElementById('customers-table-body');
             tbody.innerHTML = customers.map((c, index) => `
                 <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-bold">${c.name}</td>
-                    <td class="p-4">${c.phone}</td>
-                    <td class="p-4">${c.address}</td>
+                    <td class="p-4 font-bold">${escapeHTML(c.name)}</td>
+                    <td class="p-4">${escapeHTML(c.phone)}</td>
+                    <td class="p-4">${escapeHTML(c.address)}</td>
                     <td class="p-4 font-bold text-red-600">TSH ${c.debt || 0}</td>
                     <td class="p-4 text-center">
                         <button onclick="deleteCustomer(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
@@ -1003,9 +1009,9 @@
             const tbody = document.getElementById('suppliers-table-body');
             tbody.innerHTML = suppliers.map((s, index) => `
                 <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-bold">${s.name}</td>
-                    <td class="p-4">${s.phone}</td>
-                    <td class="p-4"><span class="px-2 py-1 bg-purple-50 text-purple-700 rounded">${s.items}</span></td>
+                    <td class="p-4 font-bold">${escapeHTML(s.name)}</td>
+                    <td class="p-4">${escapeHTML(s.phone)}</td>
+                    <td class="p-4"><span class="px-2 py-1 bg-purple-50 text-purple-700 rounded">${escapeHTML(s.items)}</span></td>
                     <td class="p-4 text-center">
                         <button onclick="deleteSupplier(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
                     </td>
@@ -1023,10 +1029,10 @@
             }
 
             grid.innerHTML = displayProducts.map(p => `
-                <div onclick="addToCart('${p.barcode}')" class="p-3 border rounded-xl hover:shadow-md cursor-pointer transition bg-gray-50 flex flex-col justify-between">
+                <div onclick="addToCart('${escapeHTML(p.barcode)}')" class="p-3 border rounded-xl hover:shadow-md cursor-pointer transition bg-gray-50 flex flex-col justify-between">
                     <div>
-                        <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold">${p.branch}</span>
-                        <h4 class="font-bold text-sm text-gray-800 mt-1">${p.name}</h4>
+                        <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold">${escapeHTML(p.branch)}</span>
+                        <h4 class="font-bold text-sm text-gray-800 mt-1">${escapeHTML(p.name)}</h4>
                     </div>
                     <div class="mt-2 flex justify-between items-center">
                         <span class="text-xs font-bold text-emerald-600">TSH ${p.price}</span>
@@ -1048,10 +1054,10 @@
             }
 
             grid.innerHTML = filtered.map(p => `
-                <div onclick="addToCart('${p.barcode}')" class="p-3 border rounded-xl hover:shadow-md cursor-pointer transition bg-gray-50 flex flex-col justify-between">
+                <div onclick="addToCart('${escapeHTML(p.barcode)}')" class="p-3 border rounded-xl hover:shadow-md cursor-pointer transition bg-gray-50 flex flex-col justify-between">
                     <div>
-                        <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold">${p.branch}</span>
-                        <h4 class="font-bold text-sm text-gray-800 mt-1">${p.name}</h4>
+                        <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold">${escapeHTML(p.branch)}</span>
+                        <h4 class="font-bold text-sm text-gray-800 mt-1">${escapeHTML(p.name)}</h4>
                     </div>
                     <div class="mt-2 flex justify-between items-center">
                         <span class="text-xs font-bold text-emerald-600">TSH ${p.price}</span>
@@ -1064,12 +1070,12 @@
         function updateCustomerDropdown() {
             const select = document.getElementById('pos-customer');
             select.innerHTML = `<option value="Cash Customer">Mteja wa Kawaida (Cash)</option>` + 
-                customers.map(c => `<option value="${c.name}">${c.name} (${c.phone})</option>`).join('');
+                customers.map(c => `<option value="${escapeHTML(c.name)}">${escapeHTML(c.name)} (${escapeHTML(c.phone)})</option>`).join('');
         }
 
         function updateSupplierDropdowns() {
             const options = `<option value="Hana Msambazaji">Hana Msambazaji</option>` + 
-                suppliers.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+                suppliers.map(s => `<option value="${escapeHTML(s.name)}">${escapeHTML(s.name)}</option>`).join('');
             document.getElementById('prod-supplier').innerHTML = options;
             document.getElementById('restock-supplier').innerHTML = options;
         }
@@ -1104,7 +1110,7 @@
                 return `
                     <div class="flex items-center justify-between border-b pb-2">
                         <div>
-                            <p class="font-bold text-sm text-gray-800">${item.name}</p>
+                            <p class="font-bold text-sm text-gray-800">${escapeHTML(item.name)}</p>
                             <p class="text-xs text-gray-500">TSH ${item.price} x ${item.qty}</p>
                         </div>
                         <div class="flex items-center gap-2">
@@ -1173,7 +1179,7 @@
             document.getElementById('receipt-type').innerText = `Aina: ${sale.paymentType === 'Credit' ? 'MKOPO' : 'CASH'}`;
             
             const tbody = document.getElementById('receipt-items-body');
-            tbody.innerHTML = sale.items.map(i => `<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.price * i.qty}</td></tr>`).join('');
+            tbody.innerHTML = sale.items.map(i => `<tr><td>${escapeHTML(i.name)}</td><td>${i.qty}</td><td>${i.price * i.qty}</td></tr>`).join('');
 
             document.getElementById('receipt-total').innerText = `TSH ${sale.total}`;
             window.print();
@@ -1244,7 +1250,7 @@
             } else {
                 lowStockContainer.innerHTML = lowStockItems.map(item => `
                     <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-amber-200">
-                        <span class="font-bold text-gray-800">${item.name} (${item.branch})</span>
+                        <span class="font-bold text-gray-800">${escapeHTML(item.name)} (${escapeHTML(item.branch)})</span>
                         <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full font-extrabold text-xs">Zimebaki: ${item.stock}</span>
                     </div>
                 `).join('');
@@ -1302,11 +1308,11 @@
                 <div class="p-4 border rounded-xl flex justify-between items-center bg-gray-50">
                     <div>
                         <div class="flex items-center gap-2">
-                            <p class="font-bold text-gray-800">${s.customer}</p>
-                            <span class="px-2 py-0.5 text-xs font-semibold rounded ${s.paymentType === 'Credit' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${s.paymentType}</span>
-                            <span class="px-2 py-0.5 text-xs font-bold bg-blue-100 text-blue-800 rounded">${s.branch}</span>
+                            <p class="font-bold text-gray-800">${escapeHTML(s.customer)}</p>
+                            <span class="px-2 py-0.5 text-xs font-semibold rounded ${s.paymentType === 'Credit' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${escapeHTML(s.paymentType)}</span>
+                            <span class="px-2 py-0.5 text-xs font-bold bg-blue-100 text-blue-800 rounded">${escapeHTML(s.branch)}</span>
                         </div>
-                        <p class="text-xs text-gray-500">${s.date}</p>
+                        <p class="text-xs text-gray-500">${escapeHTML(s.date)}</p>
                     </div>
                     <span class="font-bold text-emerald-600 text-lg">TSH ${s.total}</span>
                 </div>
